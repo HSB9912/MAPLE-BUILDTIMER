@@ -3,52 +3,107 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>에반 수로 타이머</title>
+<title>메이플 빌드 타이머</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Outfit:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-:root {
+:root{
   --bg:#0a0e14;--bg2:#131920;--bg3:#1a2332;--brd:#1e2a3a;
   --t:#e2e8f0;--td:#64748b;--tm:#475569;
   --ac:#38bdf8;--acg:rgba(56,189,248,0.15);
-  --freed:#60a5fa;--summon:#a78bfa;--ascent:#fb923c;--zodiac:#2dd4bf;
-  --enver:#f87171;--elbl:#4ade80;--imb:#f472b6;--swift:#fbbf24;
-  --dive:#7dd3fc;--origin:#ff7b72;
+  --r:#f87171;--g:#4ade80;--y:#fbbf24;--p:#a78bfa;--o:#fb923c;--pk:#f472b6;--cy:#2dd4bf;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--t);font-family:'Noto Sans KR',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;user-select:none;}
 
-/* TOP */
-.top{flex-shrink:0;background:linear-gradient(180deg,#0f1520,var(--bg));border-bottom:1px solid var(--brd);padding:8px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:10;}
+/* TABS */
+.tabs{flex-shrink:0;display:flex;border-bottom:1px solid var(--brd);background:#0f1520;}
+.tab{flex:1;padding:10px;text-align:center;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:var(--tm);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
+.tab.on{color:var(--ac);border-bottom-color:var(--ac);background:rgba(56,189,248,.05);}
+.tab:hover{color:var(--t);}
+
+/* PAGES */
+.page{flex:1;display:none;flex-direction:column;overflow:hidden;}
+.page.on{display:flex;}
+
+/* ===== BUILD PAGE ===== */
+.build-top{flex-shrink:0;padding:12px 14px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--bg);}
+.build-top input{background:var(--bg2);border:1px solid var(--brd);color:var(--t);border-radius:8px;padding:7px 12px;font-size:14px;font-family:'Noto Sans KR',sans-serif;flex:1;min-width:150px;}
+.build-top input::placeholder{color:var(--tm);}
+.build-scroll{flex:1;overflow-y:auto;padding:10px 14px 100px;}
+.build-scroll::-webkit-scrollbar{width:4px;}
+.build-scroll::-webkit-scrollbar-thumb{background:var(--brd);border-radius:2px;}
+
+.b{font-family:'Outfit',sans-serif;font-weight:700;font-size:12px;border:none;border-radius:7px;padding:7px 13px;cursor:pointer;transition:all .15s;letter-spacing:.3px;}
+.b:active{transform:scale(.95);}
+.b1{background:var(--ac);color:#0a0e14;}
+.b2{background:var(--y);color:#0a0e14;}
+.b3{background:rgba(255,255,255,.06);color:var(--td);border:1px solid var(--brd);}
+.b4{background:rgba(248,113,113,.12);color:var(--r);border:1px solid rgba(248,113,113,.2);}
+.b5{background:rgba(74,222,128,.12);color:var(--g);border:1px solid rgba(74,222,128,.2);}
+.bsm{padding:4px 8px;font-size:11px;border-radius:5px;}
+
+/* PHASE BLOCK */
+.phase-block{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+.phase-head{display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--brd);cursor:grab;}
+.phase-head:active{cursor:grabbing;}
+.phase-head input{background:transparent;border:none;color:var(--t);font-size:14px;font-weight:700;font-family:'Outfit',sans-serif;flex:1;outline:none;}
+.phase-head input::placeholder{color:var(--tm);}
+.phase-head .drag{color:var(--tm);font-size:14px;cursor:grab;}
+.phase-body{padding:8px 10px;}
+
+/* STEP ROW */
+.step{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:6px;margin-bottom:4px;background:rgba(255,255,255,.02);border:1px solid transparent;transition:background .2s;}
+.step:hover{background:rgba(255,255,255,.04);}
+.step-time{width:58px;}
+.step-time input{width:100%;background:var(--bg);border:1px solid var(--brd);color:var(--ac);border-radius:5px;padding:4px 6px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;text-align:center;}
+.step-skills{flex:1;display:flex;flex-wrap:wrap;gap:3px;align-items:center;}
+.step-skill{display:flex;align-items:center;gap:2px;border-radius:5px;padding:3px 4px 3px 8px;font-size:11px;font-weight:700;white-space:nowrap;}
+.step-skill input{background:transparent;border:none;color:inherit;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;width:auto;outline:none;min-width:30px;}
+.step-skill .sk-del{background:none;border:none;color:inherit;opacity:.5;cursor:pointer;font-size:10px;padding:0 2px;}
+.step-skill .sk-del:hover{opacity:1;}
+.step-note input{background:transparent;border:1px dashed var(--brd);color:var(--y);border-radius:4px;padding:2px 6px;font-size:10px;width:100px;font-family:'Noto Sans KR',sans-serif;outline:none;}
+.step-note input::placeholder{color:var(--tm);}
+.step-btns{display:flex;gap:3px;flex-shrink:0;}
+
+.add-skill-btn{background:rgba(56,189,248,.1);border:1px dashed rgba(56,189,248,.3);color:var(--ac);border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;white-space:nowrap;}
+.add-skill-btn:hover{background:rgba(56,189,248,.2);}
+
+.add-step{padding:6px;text-align:center;}
+
+/* COLOR PICKER */
+.color-sel{position:relative;}
+.color-dot{width:14px;height:14px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,.15);flex-shrink:0;}
+.color-pop{position:absolute;top:24px;left:0;background:var(--bg2);border:1px solid var(--brd);border-radius:8px;padding:6px;display:none;flex-wrap:wrap;gap:4px;z-index:20;width:120px;}
+.color-pop.show{display:flex;}
+.color-opt{width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border .15s;}
+.color-opt:hover{border-color:white;}
+
+/* IMPORT/EXPORT */
+.io-bar{flex-shrink:0;padding:8px 14px;border-top:1px solid var(--brd);background:var(--bg);display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.io-bar .info{font-size:11px;color:var(--tm);margin-right:auto;}
+
+/* ===== TIMER PAGE ===== */
+.timer-top{flex-shrink:0;background:linear-gradient(180deg,#0f1520,var(--bg));border-bottom:1px solid var(--brd);padding:8px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:10;}
 .timer-sec{text-align:center;}
 .ph{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--tm);font-family:'Outfit',sans-serif;}
 .ph.on{color:var(--ac);}
 .td{font-family:'JetBrains Mono',monospace;font-size:48px;font-weight:700;color:var(--ac);line-height:1;min-width:100px;text-shadow:0 0 25px rgba(56,189,248,0.3);}
-.td.pre{color:var(--swift);text-shadow:0 0 25px rgba(251,191,36,0.3);}
-.td.setup{color:var(--zodiac);}
-.td.end{color:var(--enver);}
+.td.pre{color:var(--y);text-shadow:0 0 25px rgba(251,191,36,0.3);}
+.td.setup{color:var(--cy);}
+.td.end{color:var(--r);}
 
 .ctrls{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
-.b{font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;transition:all .15s;letter-spacing:.3px;}
-.b:active{transform:scale(.95);}
-.b1{background:var(--ac);color:#0a0e14;}
-.b2{background:var(--swift);color:#0a0e14;}
-.b3{background:rgba(255,255,255,.06);color:var(--td);border:1px solid var(--brd);}
-.b4{background:linear-gradient(135deg,rgba(167,139,250,.2),rgba(56,189,248,.2));color:var(--ac);border:1px solid rgba(56,189,248,.3);}
-.b5{background:rgba(255,255,255,.04);color:var(--td);border:1px solid var(--brd);font-size:15px;padding:8px 10px;}
 
-/* PROGRESS */
+.sbar{flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--brd);padding:5px 14px;display:flex;align-items:center;gap:10px;font-size:11px;overflow-x:auto;}
+.sbar label{display:flex;align-items:center;gap:4px;color:var(--td);cursor:pointer;white-space:nowrap;}
+.sbar input[type=checkbox]{accent-color:var(--ac);width:13px;height:13px;}
+.sbar .vol{width:50px;accent-color:var(--ac);}
+.sbar select{background:var(--bg);border:1px solid var(--brd);color:var(--t);border-radius:5px;padding:2px 4px;font-size:10px;max-width:140px;}
+.sbar .test-btn{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.25);color:var(--ac);border-radius:5px;padding:2px 7px;font-size:10px;cursor:pointer;white-space:nowrap;}
+
 .pg-w{flex-shrink:0;height:3px;background:rgba(255,255,255,.04);}
-.pg-b{height:100%;background:linear-gradient(90deg,var(--ac),var(--summon));width:0%;transition:width .3s linear;}
+.pg-b{height:100%;background:linear-gradient(90deg,var(--ac),var(--p));width:0%;transition:width .3s linear;}
 
-/* SETTINGS BAR */
-.sbar{flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--brd);padding:6px 14px;display:flex;align-items:center;gap:12px;font-size:12px;overflow-x:auto;}
-.sbar label{display:flex;align-items:center;gap:5px;color:var(--td);cursor:pointer;white-space:nowrap;}
-.sbar input[type=checkbox]{accent-color:var(--ac);width:14px;height:14px;}
-.sbar .vol{width:60px;accent-color:var(--ac);}
-.sbar select{background:var(--bg);border:1px solid var(--brd);color:var(--t);border-radius:6px;padding:3px 6px;font-size:11px;max-width:160px;font-family:'Noto Sans KR',sans-serif;}
-.sbar .test-btn{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.25);color:var(--ac);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;white-space:nowrap;}
-
-/* TIMELINE */
 .tl-w{flex:1;overflow-y:auto;padding:6px 10px 100px;scroll-behavior:smooth;}
 .tl-w::-webkit-scrollbar{width:3px;}
 .tl-w::-webkit-scrollbar-thumb{background:var(--brd);border-radius:2px;}
@@ -64,27 +119,10 @@ body{background:var(--bg);color:var(--t);font-family:'Noto Sans KR',sans-serif;h
 
 .tt{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--td);min-width:44px;text-align:right;flex-shrink:0;}
 .ts{display:flex;flex-wrap:wrap;align-items:center;gap:4px;flex:1;}
-
 .sk{display:inline-flex;font-size:12px;font-weight:700;padding:3px 8px;border-radius:5px;white-space:nowrap;}
-.sk-freed{background:rgba(96,165,250,.15);color:var(--freed);}
-.sk-summon{background:rgba(167,139,250,.15);color:var(--summon);}
-.sk-ascent{background:rgba(251,146,60,.15);color:var(--ascent);}
-.sk-zodiac{background:rgba(45,212,191,.15);color:var(--zodiac);}
-.sk-enver{background:rgba(248,113,113,.15);color:var(--enver);}
-.sk-elbl{background:rgba(74,222,128,.15);color:var(--elbl);}
-.sk-imb{background:rgba(244,114,182,.15);color:var(--imb);}
-.sk-swift{background:rgba(251,191,36,.15);color:var(--swift);}
-.sk-dive{background:rgba(125,211,252,.15);color:var(--dive);}
-.sk-origin{background:rgba(255,123,114,.15);color:var(--origin);}
-.sk-default{background:rgba(255,255,255,.06);color:var(--td);}
-.sk-entry{background:rgba(251,146,60,.2);color:var(--ascent);}
-
 .aw{color:var(--tm);font-size:11px;}
-.tn{font-size:10px;color:var(--swift);padding-left:54px;margin-bottom:2px;}
-.tn.warn{color:var(--enver);}
-.tn.info{color:var(--zodiac);}
+.tn{font-size:10px;color:var(--y);padding-left:54px;margin-bottom:2px;}
 
-/* NEXT */
 .nb{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(0deg,var(--bg) 60%,transparent);padding:30px 14px 10px;z-index:5;display:none;}
 .nb.on{display:block;}
 .ni{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:8px;}
@@ -92,86 +130,90 @@ body{background:var(--bg);color:var(--t);font-family:'Noto Sans KR',sans-serif;h
 .ns{display:flex;flex-wrap:wrap;gap:3px;}
 .nt{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:16px;color:var(--ac);margin-left:auto;}
 
-/* MODAL */
+/* KEYBIND MODAL */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:none;align-items:center;justify-content:center;}
 .modal-bg.show{display:flex;}
-.modal{background:var(--bg2);border:1px solid var(--brd);border-radius:14px;width:90%;max-width:600px;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;}
-.modal-head{padding:14px 16px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;}
-.modal-head h2{font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;}
-.modal-close{background:none;border:none;color:var(--td);font-size:20px;cursor:pointer;padding:4px 8px;}
+.modal{background:var(--bg2);border:1px solid var(--brd);border-radius:14px;width:90%;max-width:500px;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;}
+.modal-head{padding:12px 16px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;}
+.modal-head h2{font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;}
+.modal-close{background:none;border:none;color:var(--td);font-size:18px;cursor:pointer;}
 .modal-body{flex:1;overflow-y:auto;padding:12px 16px;}
 .modal-foot{padding:10px 16px;border-top:1px solid var(--brd);display:flex;gap:8px;justify-content:flex-end;}
-
-/* EDIT TABLE */
-.ed-sec{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:1px;padding:10px 0 4px;}
-.ed-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);}
-.ed-row input[type=number]{width:50px;background:var(--bg);border:1px solid var(--brd);color:var(--t);border-radius:6px;padding:4px 6px;font-family:'JetBrains Mono',monospace;font-size:12px;text-align:center;}
-.ed-row input[type=text]{flex:1;background:var(--bg);border:1px solid var(--brd);color:var(--t);border-radius:6px;padding:4px 8px;font-size:12px;}
-.ed-row .ed-label{font-size:12px;color:var(--td);min-width:40px;}
-
-/* KEYBIND */
 .kb-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);}
-.kb-row .kb-label{font-size:13px;color:var(--t);min-width:120px;}
-.kb-btn{background:var(--bg);border:1px solid var(--brd);color:var(--ac);border-radius:6px;padding:5px 12px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;cursor:pointer;min-width:80px;text-align:center;transition:all .2s;}
-.kb-btn:hover{border-color:var(--ac);}
-.kb-btn.recording{border-color:var(--enver);color:var(--enver);animation:pulse 1s infinite;}
+.kb-label{font-size:13px;color:var(--t);min-width:100px;}
+.kb-btn{background:var(--bg);border:1px solid var(--brd);color:var(--ac);border-radius:6px;padding:5px 12px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;cursor:pointer;min-width:80px;text-align:center;}
+.kb-btn.rec{border-color:var(--r);color:var(--r);animation:pulse 1s infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 20px;color:var(--tm);}
+.empty h3{font-family:'Outfit',sans-serif;font-size:18px;color:var(--td);margin-bottom:8px;}
+.empty p{font-size:13px;line-height:1.6;}
 
 @media(max-width:500px){
   .td{font-size:34px;min-width:80px;}
-  .b{padding:6px 10px;font-size:11px;}
-  .sk{font-size:10px;padding:2px 6px;}
+  .b{padding:5px 10px;font-size:11px;}
 }
 </style>
 </head>
 <body>
 
-<div class="top">
-  <div class="timer-sec">
-    <div class="ph" id="phLabel">준비</div>
-    <div class="td pre" id="timerD">--</div>
-  </div>
-  <div class="ctrls">
-    <button class="b b1" id="btnS" onclick="toggle()">시작</button>
-    <button class="b b3" onclick="reset()">리셋</button>
-    <button class="b b4" onclick="openPip()">⧉ PIP</button>
-    <button class="b b5" onclick="openEdit()" title="편집">✏️</button>
-    <button class="b b5" onclick="openKeys()" title="단축키">⌨️</button>
-  </div>
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab on" onclick="switchTab('build')">📝 빌드 편집</div>
+  <div class="tab" onclick="switchTab('timer')">⏱️ 타이머</div>
 </div>
 
-<div class="sbar">
-  <label><input type="checkbox" id="chkBeep" checked> 🔔 비프음</label>
-  <input type="range" class="vol" id="volBeep" min="0" max="100" value="50" title="비프 볼륨">
-  <label><input type="checkbox" id="chkTts" checked> 🗣️ 음성</label>
-  <input type="range" class="vol" id="volTts" min="0" max="100" value="80" title="음성 볼륨">
-  <select id="voiceSelect" title="음성 선택"></select>
-  <button class="test-btn" onclick="testVoice()">테스트</button>
-  <label title="속도"><span style="color:var(--td);font-size:11px;">속도</span><input type="range" class="vol" id="ttsRate" min="50" max="300" value="160" title="말하기 속도"></label>
-  <label><input type="checkbox" id="chkPreTts"> 📢 2초전 예고</label>
-</div>
-
-<div class="pg-w"><div class="pg-b" id="pgBar"></div></div>
-<div class="tl-w" id="tlWrap"></div>
-
-<div class="nb" id="nextBar">
-  <div class="ni">
-    <div class="nl">NEXT</div>
-    <div class="ns" id="nextSk"></div>
-    <div class="nt" id="nextTm"></div>
+<!-- ===== BUILD PAGE ===== -->
+<div class="page on" id="pageBuild">
+  <div class="build-top">
+    <input id="buildName" placeholder="빌드 이름 (예: 에반 수로, 아크 극딜...)" spellcheck="false">
+    <button class="b b5" onclick="addPhase()">+ 구간 추가</button>
+    <button class="b b3" onclick="openKeys()">⌨️ 단축키</button>
   </div>
-</div>
-
-<!-- EDIT MODAL -->
-<div class="modal-bg" id="editModal">
-  <div class="modal">
-    <div class="modal-head"><h2>⏱️ 타이밍 편집</h2><button class="modal-close" onclick="closeEdit()">✕</button></div>
-    <div class="modal-body" id="editBody"></div>
-    <div class="modal-foot">
-      <button class="b b3" onclick="resetData()">기본값 복원</button>
-      <button class="b b1" onclick="saveEdit()">저장</button>
+  <div class="build-scroll" id="buildScroll">
+    <div class="empty" id="emptyState">
+      <h3>🎮 빌드 타이머</h3>
+      <p>수로, 극딜 등 어떤 빌드든 직접 만들 수 있어요.<br>
+      <b>"+ 구간 추가"</b>로 시작하세요!<br><br>
+      극딜용: 사이클을 구간으로 만들고 단축키로 리셋+시작<br>
+      수로용: 입장 전 → 입장 후 → 본 타이머 구간 세팅</p>
     </div>
   </div>
+  <div class="io-bar">
+    <span class="info">💾 빌드는 브라우저에 자동 저장됩니다</span>
+    <button class="b b3 bsm" onclick="exportBuild()">📤 내보내기</button>
+    <button class="b b3 bsm" onclick="importBuild()">📥 가져오기</button>
+    <button class="b b4 bsm" onclick="clearAll()">🗑️ 전체 삭제</button>
+  </div>
+</div>
+
+<!-- ===== TIMER PAGE ===== -->
+<div class="page" id="pageTimer">
+  <div class="timer-top">
+    <div class="timer-sec">
+      <div class="ph" id="phLabel">준비</div>
+      <div class="td" id="timerD">--</div>
+    </div>
+    <div class="ctrls">
+      <button class="b b1" id="btnS" onclick="toggle()">시작</button>
+      <button class="b b3" onclick="resetTimer()">리셋</button>
+      <button class="b" style="background:rgba(167,139,250,.15);color:var(--p);border:1px solid rgba(167,139,250,.25);" onclick="openPip()">⧉ PIP</button>
+    </div>
+  </div>
+  <div class="sbar">
+    <label><input type="checkbox" id="chkBeep" checked> 🔔 비프</label>
+    <input type="range" class="vol" id="volBeep" min="0" max="100" value="50">
+    <label><input type="checkbox" id="chkTts" checked> 🗣️ 음성</label>
+    <input type="range" class="vol" id="volTts" min="0" max="100" value="80">
+    <select id="voiceSelect"></select>
+    <button class="test-btn" onclick="testVoice()">테스트</button>
+    <label><span style="color:var(--td)">속도</span><input type="range" class="vol" id="ttsRate" min="50" max="300" value="160"></label>
+    <label><input type="checkbox" id="chkPreTts"> 📢 2초전</label>
+  </div>
+  <div class="pg-w"><div class="pg-b" id="pgBar"></div></div>
+  <div class="tl-w" id="tlWrap"></div>
+  <div class="nb" id="nextBar"><div class="ni"><div class="nl">NEXT</div><div class="ns" id="nextSk"></div><div class="nt" id="nextTm"></div></div></div>
 </div>
 
 <!-- KEYBIND MODAL -->
@@ -190,34 +232,20 @@ body{background:var(--bg);color:var(--t);font-family:'Noto Sans KR',sans-serif;h
 body{background:#0a0e14;color:#e2e8f0;font-family:'Noto Sans KR',sans-serif;display:flex;flex-direction:column;height:100vh;overflow:hidden;user-select:none;}
 .ph{padding:6px 10px;background:#0f1520;border-bottom:1px solid #1e2a3a;display:flex;align-items:center;justify-content:space-between;}
 .pt{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:#38bdf8;text-shadow:0 0 20px rgba(56,189,248,.3);}
-.pt.pre{color:#fbbf24;} .pt.setup{color:#2dd4bf;} .pt.end{color:#f87171;}
+.pt.end{color:#f87171;}
 .pp{font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#475569;}
 .pp.on{color:#38bdf8;}
 .ppg{height:2px;background:rgba(255,255,255,.04);flex-shrink:0;}
 .ppg-b{height:100%;background:linear-gradient(90deg,#38bdf8,#a78bfa);width:0%;}
 .pb{flex:1;overflow-y:auto;padding:4px 6px 40px;scroll-behavior:smooth;}
-.pb::-webkit-scrollbar{width:2px;} .pb::-webkit-scrollbar-thumb{background:#1e2a3a;}
+.pb::-webkit-scrollbar{width:2px;}.pb::-webkit-scrollbar-thumb{background:#1e2a3a;}
 .pr{display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:6px;margin-bottom:1px;border:1px solid transparent;transition:all .2s;}
 .pr.active{background:#1a2332;border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.15);}
-.pr.done{opacity:.25;} .pr.upcoming{opacity:.5;}
+.pr.done{opacity:.25;}.pr.upcoming{opacity:.5;}
 .pr .pt2{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#64748b;min-width:32px;text-align:right;}
 .pr.active .pt2{color:#38bdf8;}
 .psk{display:flex;flex-wrap:wrap;gap:2px;}
-.ps{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;white-space:nowrap;}
-.ps-freed{background:rgba(96,165,250,.18);color:#60a5fa;}
-.ps-summon{background:rgba(167,139,250,.18);color:#a78bfa;}
-.ps-ascent{background:rgba(251,146,60,.18);color:#fb923c;}
-.ps-zodiac{background:rgba(45,212,191,.18);color:#2dd4bf;}
-.ps-enver{background:rgba(248,113,113,.18);color:#f87171;}
-.ps-elbl{background:rgba(74,222,128,.18);color:#4ade80;}
-.ps-imb{background:rgba(244,114,182,.18);color:#f472b6;}
-.ps-swift{background:rgba(251,191,36,.18);color:#fbbf24;}
-.ps-dive{background:rgba(125,211,252,.18);color:#7dd3fc;}
-.ps-origin{background:rgba(255,123,114,.18);color:#ff7b72;}
-.ps-default{background:rgba(255,255,255,.08);color:#64748b;}
-.ps-entry{background:rgba(251,146,60,.22);color:#fb923c;}
 .pn{font-size:8px;color:#fbbf24;padding-left:38px;margin-bottom:1px;}
-.pn.warn{color:#f87171;} .pn.info{color:#2dd4bf;}
 .psd{padding:6px 4px 3px;font-family:'Outfit',sans-serif;font-size:8px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:1px;}
 .pnx{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(0deg,#0a0e14 70%,transparent);padding:16px 6px 6px;display:none;}
 .pnx.on{display:block;}
@@ -226,68 +254,302 @@ body{background:#0a0e14;color:#e2e8f0;font-family:'Noto Sans KR',sans-serif;disp
 .pnxs{display:flex;gap:2px;flex-wrap:wrap;}
 .pnxt{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#38bdf8;margin-left:auto;}
 </style>
-<div class="ph"><div><div class="pp" id="pipPh">준비</div><div class="pt pre" id="pipTm">--</div></div></div>
+<div class="ph"><div><div class="pp" id="pipPh">준비</div><div class="pt" id="pipTm">--</div></div></div>
 <div class="ppg"><div class="ppg-b" id="pipPg"></div></div>
 <div class="pb" id="pipBd"></div>
 <div class="pnx" id="pipNx"><div class="pnxi"><div class="pnxl">NEXT</div><div class="pnxs" id="pipNxSk"></div><div class="pnxt" id="pipNxTm"></div></div></div>
 </template>
 
 <script>
-// ===== DATA =====
-const PRE=50,SETUP=5,MAIN=120,TOTAL=PRE+SETUP+MAIN;
-
-const defaultPre=[
-  {t:50,s:[['전분','default'],['일필','default']]},
-  {t:41,s:[['메용2','default'],['오쓰','default']]},
-  {t:37,s:[['프리드','freed']]},
-  {t:25,s:[['카인링크','default']]},
-  {t:20,s:[['일필','default']]},
-  {t:12,s:[['프리드','freed']]},
-  {t:0,s:[['🚪 입장','entry']]},
+// ===== SKILL COLORS =====
+const COLORS=[
+  {id:'blue',c:'#60a5fa',bg:'rgba(96,165,250,.15)'},
+  {id:'purple',c:'#a78bfa',bg:'rgba(167,139,250,.15)'},
+  {id:'orange',c:'#fb923c',bg:'rgba(251,146,60,.15)'},
+  {id:'cyan',c:'#2dd4bf',bg:'rgba(45,212,191,.15)'},
+  {id:'red',c:'#f87171',bg:'rgba(248,113,113,.15)'},
+  {id:'green',c:'#4ade80',bg:'rgba(74,222,128,.15)'},
+  {id:'pink',c:'#f472b6',bg:'rgba(244,114,182,.15)'},
+  {id:'yellow',c:'#fbbf24',bg:'rgba(251,191,36,.15)'},
+  {id:'sky',c:'#7dd3fc',bg:'rgba(125,211,252,.15)'},
+  {id:'coral',c:'#ff7b72',bg:'rgba(255,123,114,.15)'},
+  {id:'gray',c:'#64748b',bg:'rgba(255,255,255,.06)'},
 ];
-const defaultSetup=[
-  {t:0,s:[['브레스','default'],['돌아와','swift']],n:'불장판'},
-  {t:3,s:[['조디악','zodiac']]},
-  {t:5,s:[['서먼 START','summon']],n:'120초 시작!'},
-];
-const defaultMain=[
-  {t:120,sec:'서먼 다이브',s:[['프리드 3스택','freed'],['다이브/다오어','dive']],n:'1~4단계 점수별 진행'},
-  {t:114,s:[['조디악','zodiac']],n:'5단계 넘기기'},
-  {t:113,s:[['스위프트 돌아와','swift'],['임브','imb']],n:'6단계 진입 / 수로몹 변신 후'},
-  {t:99,sec:'어센트 구간',s:[['어센트 ①','ascent']]},
-  {t:90,s:[['프리드 4스택','freed']]},
-  {t:89,s:[['드브','default'],['어센트 ②','ascent']]},
-  {t:88,s:[['엘블','elbl'],['일필','default'],['임브','imb']],n:'⚠️ 엘블 빡빡함!',nc:'warn'},
-  {t:74,s:[['어센트 ③ 끝','ascent']],n:'컨티 꺼질 때쯤',nc:'info'},
-  {t:70,s:[['서먼','summon']]},
-  {t:67,sec:'엔버 시퀀스',s:[['엔버링크','enver']]},
-  {t:61,s:[['드브','default']]},
-  {t:60,s:[['프리드 (캔슬)','freed'],['엘블','elbl'],['임브','imb']]},
-  {t:58,s:[['메용2','default'],['오쓰','default']],n:'시퀀스'},
-  {t:56,s:[['오리진','origin']],n:'순서대로! 꼬아서 X',nc:'warn'},
-  {t:52,s:[['스인미','default'],['크오솔','default']]},
-  {t:37,s:[['임브','imb']]},
-  {t:30,sec:'마무리 극딜',s:[['프리드 6스택','freed']]},
-  {t:19,s:[['엔버링크','enver']]},
-  {t:16,s:[['조디악','zodiac'],['드브','default'],['서먼 (캔슬)','summon']]},
-  {t:15,s:[['엘블','elbl'],['임브','imb']]},
-  {t:5,s:[['잔여 극딜','default'],['평딜','default']],n:'남은 쿨 전부 소진'},
-];
+function getColor(id){return COLORS.find(c=>c.id===id)||COLORS[10];}
 
-function clone(a){return JSON.parse(JSON.stringify(a));}
-let preS=clone(defaultPre), setupS=clone(defaultSetup), mainS=clone(defaultMain);
+// ===== BUILD DATA =====
+// phases: [{name, icon, mode:'countdown'|'countup', duration, steps:[{t, skills:[{name,color}], note}]}]
+let buildName='';
+let phases=[];
 
-// ===== STATE =====
-let iv=null,ms=0,on=false,pipWin=null;
-let firedSet=new Set(); // track which steps already beeped/spoke
+function save(){
+  try{localStorage.setItem('build_data',JSON.stringify({name:buildName,phases}));}catch(e){}
+  updateEmpty();
+}
+function load(){
+  try{
+    const d=JSON.parse(localStorage.getItem('build_data'));
+    if(d){buildName=d.name||'';phases=d.phases||[];}
+  }catch(e){}
+}
+
+// ===== BUILD UI =====
+function updateEmpty(){
+  document.getElementById('emptyState').style.display=phases.length?'none':'block';
+}
+
+function renderBuild(){
+  document.getElementById('buildName').value=buildName;
+  const wrap=document.getElementById('buildScroll');
+  // Keep empty state
+  let html='<div class="empty" id="emptyState" style="display:'+(phases.length?'none':'block')+'"><h3>🎮 빌드 타이머</h3><p>수로, 극딜 등 어떤 빌드든 직접 만들 수 있어요.<br><b>"+ 구간 추가"</b>로 시작하세요!</p></div>';
+
+  phases.forEach((ph,pi)=>{
+    html+=`<div class="phase-block" data-pi="${pi}">
+      <div class="phase-head">
+        <span class="drag">⠿</span>
+        <input value="${esc(ph.name)}" placeholder="구간 이름" onchange="phases[${pi}].name=this.value;save();" spellcheck="false">
+        <select onchange="phases[${pi}].mode=this.value;save();" style="background:var(--bg);border:1px solid var(--brd);color:var(--ac);border-radius:5px;padding:3px 6px;font-size:11px;">
+          <option value="countdown" ${ph.mode==='countdown'?'selected':''}>⬇️ 카운트다운</option>
+          <option value="countup" ${ph.mode==='countup'?'selected':''}>⬆️ 카운트업</option>
+        </select>
+        <input type="number" value="${ph.duration}" min="0.1" max="600" step="0.1" style="width:55px;background:var(--bg);border:1px solid var(--brd);color:var(--y);border-radius:5px;padding:3px 6px;font-family:'JetBrains Mono',monospace;font-size:12px;text-align:center;" onchange="phases[${pi}].duration=+this.value;save();" title="구간 길이(초)">
+        <span style="font-size:10px;color:var(--tm);">초</span>
+        <button class="b b4 bsm" onclick="removePhase(${pi})">삭제</button>
+      </div>
+      <div class="phase-body">`;
+
+    ph.steps.forEach((st,si)=>{
+      const col=getColor(st.skills[0]?.color||'gray');
+      html+=`<div class="step">
+        <div class="step-time"><input type="number" value="${st.t}" min="0" max="999" step="0.1" onchange="phases[${pi}].steps[${si}].t=+this.value;save();"></div>
+        <div class="step-skills">`;
+      st.skills.forEach((sk,ki)=>{
+        const c=getColor(sk.color);
+        html+=`<span class="step-skill" style="background:${c.bg};color:${c.c};">
+          <div class="color-sel">
+            <div class="color-dot" style="background:${c.c};" onclick="toggleColorPop(this)"></div>
+            <div class="color-pop">${COLORS.map(cc=>`<div class="color-opt" style="background:${cc.c};" onclick="setSkillColor(${pi},${si},${ki},'${cc.id}')"></div>`).join('')}</div>
+          </div>
+          <input value="${esc(sk.name)}" onchange="phases[${pi}].steps[${si}].skills[${ki}].name=this.value;save();" spellcheck="false" style="width:${Math.max(30,sk.name.length*8)}px;">
+          <button class="sk-del" onclick="removeSkill(${pi},${si},${ki})">✕</button>
+        </span>`;
+      });
+      html+=`<button class="add-skill-btn" onclick="addSkill(${pi},${si})">+스킬</button></div>
+        <div class="step-note"><input placeholder="메모" value="${esc(st.note||'')}" onchange="phases[${pi}].steps[${si}].note=this.value;save();" spellcheck="false"></div>
+        <div class="step-btns"><button class="b b4 bsm" onclick="removeStep(${pi},${si})">✕</button></div>
+      </div>`;
+    });
+
+    html+=`<div class="add-step"><button class="b b5 bsm" onclick="addStep(${pi})">+ 스킬 타이밍 추가</button></div>
+      </div></div>`;
+  });
+  wrap.innerHTML=html;
+}
+
+function esc(s){return String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+
+function addPhase(){
+  phases.push({name:'',icon:'',mode:'countdown',duration:120,steps:[]});
+  save();renderBuild();
+}
+function removePhase(pi){
+  if(!confirm('이 구간을 삭제할까요?'))return;
+  phases.splice(pi,1);save();renderBuild();
+}
+function addStep(pi){
+  const lastT=phases[pi].steps.length?phases[pi].steps[phases[pi].steps.length-1].t:phases[pi].duration;
+  phases[pi].steps.push({t:Math.max(0,lastT-10),skills:[{name:'스킬명',color:'blue'}],note:''});
+  save();renderBuild();
+}
+function removeStep(pi,si){
+  phases[pi].steps.splice(si,1);save();renderBuild();
+}
+function addSkill(pi,si){
+  phases[pi].steps[si].skills.push({name:'스킬명',color:'gray'});
+  save();renderBuild();
+}
+function removeSkill(pi,si,ki){
+  if(phases[pi].steps[si].skills.length<=1)return;
+  phases[pi].steps[si].skills.splice(ki,1);save();renderBuild();
+}
+function setSkillColor(pi,si,ki,colorId){
+  phases[pi].steps[si].skills[ki].color=colorId;
+  save();renderBuild();
+  document.querySelectorAll('.color-pop').forEach(p=>p.classList.remove('show'));
+}
+function toggleColorPop(dot){
+  const pop=dot.nextElementSibling;
+  document.querySelectorAll('.color-pop').forEach(p=>{if(p!==pop)p.classList.remove('show');});
+  pop.classList.toggle('show');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.color-sel'))document.querySelectorAll('.color-pop').forEach(p=>p.classList.remove('show'));
+});
+
+document.getElementById('buildName').addEventListener('input',function(){buildName=this.value;save();});
+
+// IMPORT/EXPORT
+function exportBuild(){
+  const data=JSON.stringify({name:buildName,phases},null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`${buildName||'빌드'}.json`;
+  a.click();
+}
+function importBuild(){
+  const input=document.createElement('input');
+  input.type='file';input.accept='.json';
+  input.onchange=e=>{
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      try{
+        const d=JSON.parse(ev.target.result);
+        buildName=d.name||'';phases=d.phases||[];
+        save();renderBuild();
+        alert('빌드를 불러왔습니다!');
+      }catch(err){alert('파일 형식이 올바르지 않습니다.');}
+    };
+    r.readAsText(f);
+  };
+  input.click();
+}
+function clearAll(){
+  if(!confirm('전체 빌드를 삭제할까요?'))return;
+  buildName='';phases=[];save();renderBuild();
+}
+
+// ===== TABS =====
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',i===(tab==='build'?0:1)));
+  document.getElementById('pageBuild').classList.toggle('on',tab==='build');
+  document.getElementById('pageTimer').classList.toggle('on',tab==='timer');
+  if(tab==='timer')buildTimerView();
+}
+
+// ===== TIMER =====
+let iv=null,tMs=0,running=false,firedSet=new Set(),pipWin=null;
+let flatSteps=[]; // flattened for timer: [{elapsed,skills:[{name,color}],note,phaseName}]
+let totalDur=0;
+
+function buildTimerView(){
+  // Flatten phases into absolute elapsed timeline
+  flatSteps=[];
+  let elapsed=0;
+  phases.forEach(ph=>{
+    ph.steps.forEach(st=>{
+      let absE;
+      if(ph.mode==='countdown') absE=elapsed+(ph.duration-st.t);
+      else absE=elapsed+st.t;
+      flatSteps.push({elapsed:absE,skills:st.skills,note:st.note,phaseName:ph.name,phaseStart:elapsed,phaseDur:ph.duration});
+    });
+    elapsed+=ph.duration;
+  });
+  totalDur=elapsed;
+  flatSteps.sort((a,b)=>a.elapsed-b.elapsed);
+  renderTimerList();
+  updateTimer();
+}
+
+function renderTimerList(){
+  const w=document.getElementById('tlWrap');
+  if(!flatSteps.length){w.innerHTML='<div class="empty"><h3>빌드가 비어있어요</h3><p>편집 탭에서 구간과 스킬을 추가하세요.</p></div>';return;}
+  let html='',lastPh='';
+  flatSteps.forEach((st,i)=>{
+    if(st.phaseName!==lastPh){html+=`<div class="sdv">${st.phaseName||'구간'}</div>`;lastPh=st.phaseName;}
+    const sk=st.skills.map(s=>{const c=getColor(s.color);return `<span class="sk" style="background:${c.bg};color:${c.c};">${s.name}</span>`;}).join('<span class="aw">→</span>');
+    const nt=st.note?`<div class="tn">${st.note}</div>`:'';
+    // Show phase-relative time
+    const relT=st.elapsed-st.phaseStart;
+    const pDur=st.phaseDur;
+    const remaining=pDur-relT;
+    const timeStr=remaining<10?remaining.toFixed(1)+'s':Math.round(remaining)+'s';
+    html+=`<div class="tl upcoming" id="ts-${i}"><div class="tt">${timeStr}</div><div class="ts">${sk}</div></div>${nt}`;
+  });
+  w.innerHTML=html;
+}
+
+function renderPipList(doc){
+  const b=doc.getElementById('pipBd');if(!b)return;
+  let html='',lastPh='';
+  flatSteps.forEach((st,i)=>{
+    if(st.phaseName!==lastPh){html+=`<div class="psd">${st.phaseName||'구간'}</div>`;lastPh=st.phaseName;}
+    const sk=st.skills.map(s=>{const c=getColor(s.color);return `<span class="ps" style="background:${c.bg};color:${c.c};font-size:10px;">${s.name}</span>`;}).join('');
+    const nt=st.note?`<div class="pn">${st.note}</div>`:'';
+    const relT=st.elapsed-st.phaseStart;const remaining=st.phaseDur-relT;
+    const timeStr=remaining<10?remaining.toFixed(1)+'s':Math.round(remaining)+'s';
+    html+=`<div class="pr upcoming" id="p-ts-${i}"><div class="pt2">${timeStr}</div><div class="psk">${sk}</div></div>${nt}`;
+  });
+  b.innerHTML=html;
+}
+
+function updateTimer(){
+  const e=tMs/1000;
+  updateTimerDoc(document,e,false);
+  if(pipWin&&!pipWin.closed)updateTimerDoc(pipWin.document,e,true);
+  fireAudio(e);
+}
+
+function updateTimerDoc(doc,e,pip){
+  const tEl=doc.getElementById(pip?'pipTm':'timerD');
+  const pEl=doc.getElementById(pip?'pipPh':'phLabel');
+  const gEl=doc.getElementById(pip?'pipPg':'pgBar');
+  if(!tEl)return;
+
+  // Find current phase
+  let cum=0,curPh=null;
+  for(const ph of phases){
+    if(e<cum+ph.duration){curPh={name:ph.name,mode:ph.mode,dur:ph.duration,start:cum,localE:e-cum};break;}
+    cum+=ph.duration;
+  }
+
+  tEl.className=pip?'pt':'td';
+  if(!curPh||e>=totalDur){
+    tEl.textContent='0';tEl.classList.add('end');
+    pEl.textContent='종료';pEl.className=pip?'pp':'ph';
+  } else {
+    const raw=curPh.mode==='countdown'?curPh.dur-curPh.localE:curPh.localE;
+    const disp=raw<10?Math.max(0,raw).toFixed(1):Math.ceil(Math.max(0,raw));
+    tEl.textContent=disp;
+    pEl.textContent=curPh.name||'진행중';
+    pEl.className=(pip?'pp':'ph')+' on';
+  }
+  if(gEl)gEl.style.width=Math.min(100,(e/Math.max(1,totalDur))*100)+'%';
+
+  // Highlight
+  let ae=null;const px=pip?'p-':'';
+  flatSteps.forEach((st,i)=>{
+    const el=doc.getElementById(`${px}ts-${i}`);if(!el)return;
+    el.className=pip?'pr':'tl';
+    if(e<st.elapsed-0.5)el.classList.add('upcoming');
+    else if(e<st.elapsed+4){el.classList.add('active');ae=el;}
+    else el.classList.add('done');
+  });
+  if(ae&&running)ae.scrollIntoView({behavior:'smooth',block:'center'});
+
+  // Next
+  const bar=doc.getElementById(pip?'pipNx':'nextBar');
+  const nsk=doc.getElementById(pip?'pipNxSk':'nextSk');
+  const ntm=doc.getElementById(pip?'pipNxTm':'nextTm');
+  if(!bar)return;
+  if(!running){bar.classList.remove('on');return;}
+  let ns=null,su=0;
+  for(const st of flatSteps){if(e<st.elapsed-0.5){ns=st;su=st.elapsed-e;break;}}
+  if(ns){
+    bar.classList.add('on');
+    nsk.innerHTML=ns.skills.map(s=>{const c=getColor(s.color);return `<span class="${pip?'ps':'sk'}" style="background:${c.bg};color:${c.c};font-size:${pip?9:11}px;">${s.name}</span>`;}).join('');
+    ntm.textContent=su<10?su.toFixed(1)+'초 후':Math.ceil(su)+'초 후';
+  } else bar.classList.remove('on');
+}
 
 // ===== AUDIO =====
 const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
 function beep(freq=880,dur=0.08){
   if(!document.getElementById('chkBeep').checked)return;
   const vol=document.getElementById('volBeep').value/100;
-  const o=audioCtx.createOscillator();
-  const g=audioCtx.createGain();
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
   o.connect(g);g.connect(audioCtx.destination);
   o.frequency.value=freq;o.type='sine';
   g.gain.setValueAtTime(vol*0.3,audioCtx.currentTime);
@@ -297,363 +559,138 @@ function beep(freq=880,dur=0.08){
 function speak(text){
   if(!document.getElementById('chkTts').checked)return;
   if(!('speechSynthesis' in window))return;
-  window.speechSynthesis.cancel();
+  speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(text);
-  u.lang='ko-KR';
-  u.rate=document.getElementById('ttsRate').value/100;
-  u.pitch=1.0;
+  u.lang='ko-KR';u.rate=document.getElementById('ttsRate').value/100;u.pitch=1.0;
   u.volume=document.getElementById('volTts').value/100;
   const sel=document.getElementById('voiceSelect');
   const voices=speechSynthesis.getVoices();
-  if(sel.value){
-    const chosen=voices.find(v=>v.voiceURI===sel.value);
-    if(chosen)u.voice=chosen;
-  }
+  if(sel.value){const ch=voices.find(v=>v.voiceURI===sel.value);if(ch)u.voice=ch;}
   speechSynthesis.speak(u);
 }
-function testVoice(){
-  audioCtx.resume();
-  speak('프리드 3스택, 준비');
-}
+function testVoice(){audioCtx.resume();speak('프리드 3스택, 준비');}
 function loadVoices(){
   const sel=document.getElementById('voiceSelect');
   const voices=speechSynthesis.getVoices();
-  const saved=localStorage.getItem('evan_voice')||'';
+  const saved=localStorage.getItem('build_voice')||'';
   sel.innerHTML='';
-  // Korean voices first, then others
   const ko=voices.filter(v=>v.lang.startsWith('ko'));
   const others=voices.filter(v=>!v.lang.startsWith('ko'));
-  if(ko.length){
-    const og=document.createElement('optgroup');og.label='🇰🇷 한국어';
-    ko.forEach(v=>{const o=document.createElement('option');o.value=v.voiceURI;o.textContent=`${v.name}`;if(v.voiceURI===saved)o.selected=true;og.appendChild(o);});
-    sel.appendChild(og);
-  }
-  if(others.length){
-    const og=document.createElement('optgroup');og.label='기타';
-    others.forEach(v=>{const o=document.createElement('option');o.value=v.voiceURI;o.textContent=`${v.name} (${v.lang})`;if(v.voiceURI===saved)o.selected=true;og.appendChild(o);});
-    sel.appendChild(og);
-  }
-  if(!saved&&ko.length){sel.value=ko[0].voiceURI;}
+  if(ko.length){const og=document.createElement('optgroup');og.label='🇰🇷 한국어';ko.forEach(v=>{const o=document.createElement('option');o.value=v.voiceURI;o.textContent=v.name;if(v.voiceURI===saved)o.selected=true;og.appendChild(o);});sel.appendChild(og);}
+  if(others.length){const og=document.createElement('optgroup');og.label='기타';others.forEach(v=>{const o=document.createElement('option');o.value=v.voiceURI;o.textContent=`${v.name} (${v.lang})`;if(v.voiceURI===saved)o.selected=true;og.appendChild(o);});sel.appendChild(og);}
+  if(!saved&&ko.length)sel.value=ko[0].voiceURI;
 }
-document.getElementById('voiceSelect').addEventListener('change',function(){
-  try{localStorage.setItem('evan_voice',this.value);}catch(e){}
-});
+document.getElementById('voiceSelect').addEventListener('change',function(){try{localStorage.setItem('build_voice',this.value);}catch(e){}});
 
-// ===== KEYBINDS =====
-let binds={toggle:'Space',reset:'KeyR',pip:'KeyP'};
-try{const saved=localStorage.getItem('evan_binds');if(saved)binds=JSON.parse(saved);}catch(e){}
-
-let recordingKey=null;
-document.addEventListener('keydown',e=>{
-  if(recordingKey){
-    e.preventDefault();
-    binds[recordingKey]=e.code;
-    try{localStorage.setItem('evan_binds',JSON.stringify(binds));}catch(x){}
-    renderKeysModal();
-    recordingKey=null;
-    return;
-  }
-  // Don't trigger if typing in input
-  if(e.target.tagName==='INPUT')return;
-  if(e.code===binds.toggle){e.preventDefault();toggle();}
-  if(e.code===binds.reset){e.preventDefault();reset();}
-  if(e.code===binds.pip){e.preventDefault();openPip();}
-});
-
-// ===== PHASE =====
-function phase(e){
-  if(e<PRE)return{p:'pre',rem:PRE-e};
-  if(e<PRE+SETUP)return{p:'setup',se:e-PRE};
-  return{p:'main',rem:Math.max(0,MAIN-(e-PRE-SETUP))};
-}
-
-// Compute the absolute elapsed time when a step fires
-function stepElapsed(ph,step){
-  if(ph==='pre')return PRE-step.t;
-  if(ph==='setup')return PRE+step.t;
-  return PRE+SETUP+(MAIN-step.t);
-}
-
-// ===== RENDER =====
-function renderAll(){
-  renderMain();
-  if(pipWin&&!pipWin.closed)renderPip(pipWin.document);
-}
-function renderMain(){
-  const w=document.getElementById('tlWrap');
-  let h='<div class="sdv">⚡ 입장 전</div>';
-  preS.forEach((s,i)=>{h+=mRow('pre',i,s,s.t===0?'입장':`-${s.t}s`);});
-  h+='<div class="sdv">🔥 입장 후 세팅</div>';
-  setupS.forEach((s,i)=>{h+=mRow('setup',i,s,`+${s.t}s`);});
-  let ls='';
-  mainS.forEach((s,i)=>{
-    if(s.sec&&s.sec!==ls){const ic={'서먼 다이브':'🐲','어센트 구간':'🦅','엔버 시퀀스':'💥','마무리 극딜':'🏁'};h+=`<div class="sdv">${ic[s.sec]||''} ${s.sec}</div>`;ls=s.sec;}
-    h+=mRow('main',i,s,`${s.t}s`);
-  });
-  w.innerHTML=h;
-}
-function mRow(ph,i,st,ts){
-  const sk=st.s.map(([n,c])=>`<span class="sk sk-${c}">${n}</span>`).join('<span class="aw">→</span>');
-  const nt=st.n?`<div class="tn ${st.nc||''}">${st.n}</div>`:'';
-  return `<div class="tl upcoming" id="${ph}-${i}"><div class="tt">${ts}</div><div class="ts">${sk}</div></div>${nt}`;
-}
-
-function renderPip(doc){
-  const b=doc.getElementById('pipBd');if(!b)return;
-  let h='<div class="psd">⚡ 입장 전</div>';
-  preS.forEach((s,i)=>{h+=pRow('pre',i,s,s.t===0?'입장':`-${s.t}s`);});
-  h+='<div class="psd">🔥 세팅</div>';
-  setupS.forEach((s,i)=>{h+=pRow('setup',i,s,`+${s.t}s`);});
-  let ls='';
-  mainS.forEach((s,i)=>{
-    if(s.sec&&s.sec!==ls){const ic={'서먼 다이브':'🐲','어센트 구간':'🦅','엔버 시퀀스':'💥','마무리 극딜':'🏁'};h+=`<div class="psd">${ic[s.sec]||''} ${s.sec}</div>`;ls=s.sec;}
-    h+=pRow('main',i,s,`${s.t}s`);
-  });
-  b.innerHTML=h;
-}
-function pRow(ph,i,st,ts){
-  const sk=st.s.map(([n,c])=>`<span class="ps ps-${c}">${n}</span>`).join('');
-  const nt=st.n?`<div class="pn ${st.nc||''}">${st.n}</div>`:'';
-  return `<div class="pr upcoming" id="p-${ph}-${i}"><div class="pt2">${ts}</div><div class="psk">${sk}</div></div>${nt}`;
-}
-
-// ===== UPDATE =====
-function update(){
-  const e=ms/1000,p=phase(e);
-  updateDoc(document,p,e,false);
-  if(pipWin&&!pipWin.closed)updateDoc(pipWin.document,p,e,true);
-  fireAudio(e);
-}
-
-function updateDoc(doc,p,e,pip){
-  const tEl=doc.getElementById(pip?'pipTm':'timerD');
-  const pEl=doc.getElementById(pip?'pipPh':'phLabel');
-  const gEl=doc.getElementById(pip?'pipPg':'pgBar');
-  if(!tEl)return;
-
-  tEl.className=pip?'pt':'td';
-  if(p.p==='pre'){tEl.textContent=Math.ceil(p.rem);tEl.classList.add('pre');pEl.textContent='입장 전';pEl.className=pip?'pp':'ph';}
-  else if(p.p==='setup'){tEl.textContent='세팅';tEl.classList.add('setup');pEl.textContent='입장 후';pEl.className=pip?'pp':'ph';}
-  else{
-    tEl.textContent=Math.max(0,Math.ceil(p.rem));
-    pEl.className=(pip?'pp':'ph')+' on';
-    if(p.rem>99)pEl.textContent='서먼 다이브';
-    else if(p.rem>67)pEl.textContent='어센트 구간';
-    else if(p.rem>30)pEl.textContent='엔버 시퀀스';
-    else if(p.rem>0)pEl.textContent='마무리 극딜';
-    else{pEl.textContent='종료';tEl.classList.add('end');tEl.textContent='0';}
-  }
-  if(gEl)gEl.style.width=Math.min(100,(e/TOTAL)*100)+'%';
-
-  hlDoc(doc,p,e,pip);
-}
-
-function hlDoc(doc,p,e,pip){
-  let ae=null;const px=pip?'p-':'';
-  const rc=pip?'pr':'tl';
-
-  preS.forEach((s,i)=>{
-    const el=doc.getElementById(`${px}pre-${i}`);if(!el)return;
-    el.className=rc;
-    if(p.p==='pre'){const tr=PRE-s.t;if(e<tr-0.5)el.classList.add('upcoming');else if(e<tr+3.5){el.classList.add('active');ae=el;}else el.classList.add('done');}
-    else el.classList.add('done');
-  });
-  setupS.forEach((s,i)=>{
-    const el=doc.getElementById(`${px}setup-${i}`);if(!el)return;
-    el.className=rc;
-    if(p.p==='pre')el.classList.add('upcoming');
-    else if(p.p==='setup'){if(p.se<s.t-0.5)el.classList.add('upcoming');else if(p.se<s.t+2.5){el.classList.add('active');ae=el;}else el.classList.add('done');}
-    else el.classList.add('done');
-  });
-  mainS.forEach((s,i)=>{
-    const el=doc.getElementById(`${px}main-${i}`);if(!el)return;
-    el.className=rc;
-    if(p.p!=='main')el.classList.add(p.p==='pre'||p.p==='setup'?'upcoming':'done');
-    else{if(p.rem>s.t+0.5)el.classList.add('upcoming');else if(p.rem>s.t-4){el.classList.add('active');ae=el;}else el.classList.add('done');}
-  });
-
-  if(ae&&on)ae.scrollIntoView({behavior:'smooth',block:'center'});
-  nextUp(doc,p,pip);
-}
-
-function nextUp(doc,p,pip){
-  const bar=doc.getElementById(pip?'pipNx':'nextBar');
-  const sk=doc.getElementById(pip?'pipNxSk':'nextSk');
-  const tm=doc.getElementById(pip?'pipNxTm':'nextTm');
-  if(!bar)return;
-  if(!on){bar.classList.remove('on');return;}
-  let ns=null,su=0;const sc=pip?'ps':'sk';
-
-  if(p.p==='pre'){for(const s of preS){const tr=PRE-s.t,ce=PRE-p.rem;if(ce<tr-0.5){ns=s;su=Math.ceil(tr-ce);break;}}}
-  else if(p.p==='setup'){for(const s of setupS){if(p.se<s.t-0.5){ns=s;su=Math.ceil(s.t-p.se);break;}}if(!ns&&mainS.length){ns=mainS[0];su=Math.ceil(SETUP-p.se);}}
-  else{for(const s of mainS){if(p.rem>s.t+0.5){ns=s;su=Math.ceil(p.rem-s.t);break;}}}
-
-  if(ns){bar.classList.add('on');sk.innerHTML=ns.s.map(([n,c])=>`<span class="${sc} ${sc}-${c}" style="font-size:${pip?9:11}px;">${n}</span>`).join('');tm.textContent=`${su}초 후`;}
-  else bar.classList.remove('on');
-}
-
-// ===== AUDIO FIRE =====
-function fireAudio(elapsed){
-  if(!on)return;
-  const allSteps=[
-    ...preS.map((s,i)=>({ph:'pre',i,s,ae:stepElapsed('pre',s)})),
-    ...setupS.map((s,i)=>({ph:'setup',i,s,ae:stepElapsed('setup',s)})),
-    ...mainS.map((s,i)=>({ph:'main',i,s,ae:stepElapsed('main',s)})),
-  ];
-
-  for(const st of allSteps){
-    const key=`${st.ph}-${st.i}`;
-    // Fire on activation
-    if(!firedSet.has(key) && elapsed>=st.ae-0.15 && elapsed<st.ae+1){
-      firedSet.add(key);
-      beep(st.ph==='main'?880:660, 0.1);
-      const names=st.s.s.map(([n])=>n.replace('🚪 ','').replace('①','1').replace('②','2').replace('③','3')).join(', ');
-      speak(names);
+function fireAudio(e){
+  if(!running)return;
+  flatSteps.forEach((st,i)=>{
+    const key=`s-${i}`;
+    if(!firedSet.has(key)&&e>=st.elapsed-0.15&&e<st.elapsed+1){
+      firedSet.add(key);beep(880,0.1);
+      speak(st.skills.map(s=>s.name).join(', '));
     }
-    // Pre-announce 2s before
-    const preKey=`pre-${key}`;
-    if(document.getElementById('chkPreTts').checked && !firedSet.has(preKey) && elapsed>=st.ae-2.15 && elapsed<st.ae-1){
-      firedSet.add(preKey);
-      const names=st.s.s.map(([n])=>n.replace('🚪 ','').replace('①','1').replace('②','2').replace('③','3')).join(', ');
-      speak('준비, '+names);
-      beep(440,0.05);
+    const pk=`p-${i}`;
+    if(document.getElementById('chkPreTts').checked&&!firedSet.has(pk)&&e>=st.elapsed-2.15&&e<st.elapsed-1){
+      firedSet.add(pk);beep(440,0.05);speak('준비, '+st.skills.map(s=>s.name).join(', '));
     }
-  }
+  });
 }
 
 // ===== CONTROLS =====
 function toggle(){
-  audioCtx.resume(); // unlock audio
-  if(on){
-    clearInterval(iv);on=false;
-    document.getElementById('btnS').textContent='재개';
-    document.getElementById('btnS').className='b b1';
+  audioCtx.resume();
+  if(!flatSteps.length){buildTimerView();}
+  if(running){
+    clearInterval(iv);running=false;
+    document.getElementById('btnS').textContent='재개';document.getElementById('btnS').className='b b1';
   } else {
-    on=true;
-    document.getElementById('btnS').textContent='일시정지';
-    document.getElementById('btnS').className='b b2';
-    const st=performance.now()-ms;
+    running=true;
+    document.getElementById('btnS').textContent='일시정지';document.getElementById('btnS').className='b b2';
+    const st=performance.now()-tMs;
     iv=setInterval(()=>{
-      ms=performance.now()-st;
-      if(ms>=TOTAL*1000){ms=TOTAL*1000;clearInterval(iv);on=false;document.getElementById('btnS').textContent='완료';document.getElementById('btnS').disabled=true;}
-      update();
+      tMs=performance.now()-st;
+      if(tMs>=totalDur*1000){tMs=totalDur*1000;clearInterval(iv);running=false;document.getElementById('btnS').textContent='완료';document.getElementById('btnS').disabled=true;}
+      updateTimer();
     },100);
   }
 }
-function reset(){
-  clearInterval(iv);on=false;ms=0;firedSet.clear();
-  window.speechSynthesis?.cancel();
-  document.getElementById('btnS').textContent='시작';
-  document.getElementById('btnS').className='b b1';
-  document.getElementById('btnS').disabled=false;
-  renderAll();update();
+function resetTimer(){
+  clearInterval(iv);running=false;tMs=0;firedSet.clear();
+  speechSynthesis?.cancel();
+  document.getElementById('btnS').textContent='시작';document.getElementById('btnS').className='b b1';document.getElementById('btnS').disabled=false;
+  buildTimerView();
 }
 
-// ===== EDIT MODAL =====
-function openEdit(){
-  const body=document.getElementById('editBody');
-  let h='';
-  h+=edSection('입장 전',preS,'pre');
-  h+=edSection('입장 후 세팅',setupS,'setup');
-  h+=edSection('본 타이머 (120초)',mainS,'main');
-  body.innerHTML=h;
-  document.getElementById('editModal').classList.add('show');
-}
-function closeEdit(){document.getElementById('editModal').classList.remove('show');}
-function edSection(title,arr,ph){
-  let h=`<div class="ed-sec">${title}</div>`;
-  arr.forEach((s,i)=>{
-    const names=s.s.map(([n])=>n).join(' → ');
-    h+=`<div class="ed-row">
-      <span class="ed-label">${ph==='pre'?(s.t===0?'입장':`-${s.t}s`):ph==='setup'?`+${s.t}s`:`${s.t}s`}</span>
-      <input type="number" value="${s.t}" min="0" max="120" data-ph="${ph}" data-i="${i}" onchange="editTime(this)">
-      <input type="text" value="${names}" disabled style="opacity:.5;">
-    </div>`;
-  });
-  return h;
-}
-function editTime(el){
-  const ph=el.dataset.ph, i=+el.dataset.i, v=+el.value;
-  if(ph==='pre')preS[i].t=v;
-  else if(ph==='setup')setupS[i].t=v;
-  else mainS[i].t=v;
-}
-function saveEdit(){
-  try{localStorage.setItem('evan_pre',JSON.stringify(preS));localStorage.setItem('evan_setup',JSON.stringify(setupS));localStorage.setItem('evan_main',JSON.stringify(mainS));}catch(e){}
-  closeEdit();reset();
-}
-function resetData(){
-  preS=clone(defaultPre);setupS=clone(defaultSetup);mainS=clone(defaultMain);
-  try{localStorage.removeItem('evan_pre');localStorage.removeItem('evan_setup');localStorage.removeItem('evan_main');}catch(e){}
-  closeEdit();reset();
-}
-// Load saved data
-try{
-  const sp=localStorage.getItem('evan_pre');if(sp)preS=JSON.parse(sp);
-  const ss=localStorage.getItem('evan_setup');if(ss)setupS=JSON.parse(ss);
-  const sm=localStorage.getItem('evan_main');if(sm)mainS=JSON.parse(sm);
-}catch(e){}
+// ===== KEYBINDS =====
+let binds={toggle:'Space',reset:'KeyR',pip:'KeyP',quickRestart:'none'};
+try{const s=localStorage.getItem('build_binds');if(s)binds=JSON.parse(s);}catch(e){}
+let recKey=null;
 
-// ===== KEYS MODAL =====
+function quickRestart(){
+  clearInterval(iv);running=false;tMs=0;firedSet.clear();
+  speechSynthesis?.cancel();
+  document.getElementById('btnS').textContent='시작';document.getElementById('btnS').className='b b1';document.getElementById('btnS').disabled=false;
+  buildTimerView();
+  // auto start
+  setTimeout(()=>toggle(),50);
+}
+
+document.addEventListener('keydown',e=>{
+  if(recKey){
+    e.preventDefault();
+    if(e.code==='Escape'){binds[recKey]='none';}
+    else if(e.code==='Delete'||e.code==='Backspace'){binds[recKey]='none';}
+    else{binds[recKey]=e.code;}
+    try{localStorage.setItem('build_binds',JSON.stringify(binds));}catch(x){}
+    renderKeysModal();recKey=null;return;
+  }
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
+  if(binds.toggle!=='none'&&e.code===binds.toggle){e.preventDefault();toggle();}
+  if(binds.reset!=='none'&&e.code===binds.reset){e.preventDefault();resetTimer();}
+  if(binds.pip!=='none'&&e.code===binds.pip){e.preventDefault();openPip();}
+  if(binds.quickRestart!=='none'&&e.code===binds.quickRestart){e.preventDefault();quickRestart();}
+});
 function openKeys(){renderKeysModal();document.getElementById('keysModal').classList.add('show');}
-function closeKeys(){recordingKey=null;document.getElementById('keysModal').classList.remove('show');}
+function closeKeys(){recKey=null;document.getElementById('keysModal').classList.remove('show');}
 function renderKeysModal(){
-  const labels={toggle:'시작/정지',reset:'리셋',pip:'PIP 열기'};
-  let h='';
-  for(const[k,label] of Object.entries(labels)){
-    const display=formatKey(binds[k]);
-    const isRec=recordingKey===k;
-    h+=`<div class="kb-row">
-      <div class="kb-label">${label}</div>
-      <button class="kb-btn ${isRec?'recording':''}" onclick="startRecord('${k}')">${isRec?'키를 누르세요...':display}</button>
-    </div>`;
+  const labels={toggle:'시작/정지',reset:'리셋',quickRestart:'리셋+자동시작 (극딜용)',pip:'PIP'};
+  let h='<div style="font-size:11px;color:#475569;padding:0 0 10px;">Esc 또는 Delete = 미설정으로 변경</div>';
+  for(const[k,l] of Object.entries(labels)){
+    const d=formatKey(binds[k]),isR=recKey===k;
+    h+=`<div class="kb-row"><div class="kb-label">${l}</div><button class="kb-btn ${isR?'rec':''}" onclick="recKey='${k}';renderKeysModal();">${isR?'키 입력...':d}</button></div>`;
   }
   document.getElementById('keysBody').innerHTML=h;
 }
-function startRecord(key){recordingKey=key;renderKeysModal();}
-function formatKey(code){
-  const map={'Space':'스페이스','KeyR':'R','KeyP':'P','ArrowUp':'↑','ArrowDown':'↓','ArrowLeft':'←','ArrowRight':'→','Enter':'Enter','Escape':'Esc'};
-  if(map[code])return map[code];
-  if(code.startsWith('Key'))return code.slice(3);
-  if(code.startsWith('Digit'))return code.slice(5);
-  return code;
-}
+function formatKey(c){if(c==='none')return '미설정';const m={'Space':'스페이스','KeyR':'R','KeyP':'P','Enter':'Enter','Escape':'Esc'};if(m[c])return m[c];if(c.startsWith('Key'))return c.slice(3);if(c.startsWith('Digit'))return c.slice(5);return c;}
 
 // ===== PIP =====
 async function openPip(){
   if('documentPictureInPicture' in window){
     try{
       pipWin=await documentPictureInPicture.requestWindow({width:300,height:460});
-      const fl=pipWin.document.createElement('link');
-      fl.href='https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Outfit:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap';
-      fl.rel='stylesheet';pipWin.document.head.appendChild(fl);
+      const fl=pipWin.document.createElement('link');fl.href='https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Outfit:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap';fl.rel='stylesheet';pipWin.document.head.appendChild(fl);
       pipWin.document.body.appendChild(document.getElementById('pipTpl').content.cloneNode(true));
-      renderPip(pipWin.document);
-      const e=ms/1000;updateDoc(pipWin.document,phase(e),e,true);
-      pipWin.addEventListener('pagehide',()=>{pipWin=null;});
-      return;
-    }catch(e){console.log('PIP fail',e);}
+      renderPipList(pipWin.document);updateTimer();
+      pipWin.addEventListener('pagehide',()=>{pipWin=null;});return;
+    }catch(e){}
   }
   const w=300,h=460;
-  pipWin=window.open('','evan_pip',`width=${w},height=${h},left=${screen.width-w-20},top=60,toolbar=no,menubar=no`);
+  pipWin=window.open('','build_pip',`width=${w},height=${h},left=${screen.width-w-20},top=60,toolbar=no,menubar=no`);
   if(!pipWin){alert('팝업 허용 필요');return;}
   pipWin.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Outfit:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">');
-  const tpl=document.getElementById('pipTpl');const d=document.createElement('div');d.appendChild(tpl.content.cloneNode(true));
+  const tpl=document.getElementById('pipTpl'),d=document.createElement('div');d.appendChild(tpl.content.cloneNode(true));
   const sty=d.querySelector('style').outerHTML;d.querySelector('style').remove();
   pipWin.document.write(sty+'</head><body>'+d.innerHTML+'</body></html>');pipWin.document.close();
-  setTimeout(()=>{renderPip(pipWin.document);const e=ms/1000;updateDoc(pipWin.document,phase(e),e,true);},300);
-  const chk=setInterval(()=>{if(!pipWin||pipWin.closed){clearInterval(chk);pipWin=null;}},1000);
+  setTimeout(()=>{renderPipList(pipWin.document);updateTimer();},300);
+  setInterval(()=>{if(!pipWin||pipWin.closed)pipWin=null;},1000);
 }
 
-// Load voices
-if('speechSynthesis' in window){
-  speechSynthesis.onvoiceschanged=()=>loadVoices();
-  // Some browsers fire onvoiceschanged, some don't
-  setTimeout(()=>{if(document.getElementById('voiceSelect').options.length===0)loadVoices();},500);
-}
+// ===== VOICES INIT =====
+if('speechSynthesis' in window){speechSynthesis.onvoiceschanged=()=>loadVoices();setTimeout(()=>{if(!document.getElementById('voiceSelect').options.length)loadVoices();},500);}
 
-// INIT
-renderAll();update();
+// ===== INIT =====
+load();renderBuild();
 </script>
 </body>
 </html>
