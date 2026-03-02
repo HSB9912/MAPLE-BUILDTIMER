@@ -113,6 +113,18 @@ body{background:var(--bg);color:var(--t);font-family:'Noto Sans KR',sans-serif;h
 .pg-w{flex-shrink:0;height:3px;background:rgba(255,255,255,.03);}
 .pg-b{height:100%;background:linear-gradient(90deg,var(--ac),var(--p));width:0%;transition:width .3s linear;border-radius:0 2px 2px 0;}
 
+.origin-bar{flex-shrink:0;background:rgba(255,146,43,.04);border-bottom:1px solid rgba(255,146,43,.15);padding:6px 14px;}
+.origin-inner{display:flex;align-items:center;gap:8px;}
+.origin-icon{font-size:14px;}
+.origin-label{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;color:var(--o);letter-spacing:.3px;}
+.origin-cd{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--o);min-width:50px;text-shadow:0 0 12px rgba(255,146,43,.2);}
+.origin-pg{flex:1;height:3px;background:rgba(255,255,255,.04);border-radius:2px;overflow:hidden;}
+.origin-pg-b{height:100%;background:linear-gradient(90deg,var(--o),var(--y));width:0%;transition:width .5s linear;border-radius:2px;}
+.origin-btn{background:rgba(255,146,43,.1);border:1px solid rgba(255,146,43,.25);color:var(--o);border-radius:5px;padding:3px 8px;font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;cursor:pointer;}
+.origin-btn:hover{background:rgba(255,146,43,.2);}
+.origin-btn.origin-reset{color:var(--td);border-color:var(--brd);background:rgba(255,255,255,.04);}
+.origin-btn.running{background:rgba(255,212,59,.12);color:var(--y);border-color:rgba(255,212,59,.3);}
+
 .tl-w{flex:1;overflow-y:auto;padding:8px 12px 100px;scroll-behavior:smooth;}
 .tl-w::-webkit-scrollbar{width:3px;}
 .tl-w::-webkit-scrollbar-thumb{background:var(--brd);border-radius:2px;}
@@ -178,9 +190,9 @@ body{background:var(--bg);color:var(--t);font-family:'Noto Sans KR',sans-serif;h
   <div class="build-top">
     <select id="buildPresetSelect" onchange="selectPreset(this.value);renderBuild();" style="background:var(--bg2);border:1px solid var(--brd);color:var(--y);border-radius:6px;padding:5px 8px;font-family:'Noto Sans KR',sans-serif;font-size:11px;font-weight:700;">
       <option value="custom">📝 내 빌드</option>
-      <option value="p0">🔥 극딜 (0쿨뚝)</option>
-      <option value="p2">🔥 극딜 (2쿨뚝)</option>
-      <option value="p5">🔥 극딜 (5쿨뚝)</option>
+      <option value="p0">🔥 극딜+준극 (0쿨뚝/메르250)</option>
+      <option value="p2">🔥 극딜+준극 (2쿨뚝/메르250)</option>
+      <option value="p5">🔥 극딜+준극 (5쿨뚝/메르250)</option>
       <option value="boost">🚀 부스트콜 (110초)</option>
     </select>
     <input id="buildName" placeholder="빌드 이름 (예: 에반 수로, 아크 극딜...)" spellcheck="false">
@@ -214,14 +226,16 @@ body{background:var(--bg);color:var(--t);font-family:'Noto Sans KR',sans-serif;h
     <div class="ctrls">
       <select id="presetSelect" onchange="selectPreset(this.value)" style="background:var(--bg);border:1px solid var(--brd);color:var(--y);border-radius:6px;padding:5px 8px;font-family:'Noto Sans KR',sans-serif;font-size:11px;font-weight:700;max-width:160px;">
         <option value="custom">📝 내 빌드</option>
-        <option value="p0">🔥 극딜 (0쿨뚝)</option>
-        <option value="p2">🔥 극딜 (2쿨뚝)</option>
-        <option value="p5">🔥 극딜 (5쿨뚝)</option>
+        <option value="p0">🔥 극딜+준극 (0쿨뚝)</option>
+        <option value="p2">🔥 극딜+준극 (2쿨뚝)</option>
+        <option value="p5">🔥 극딜+준극 (5쿨뚝)</option>
         <option value="boost">🚀 부스트콜 (110초)</option>
       </select>
       <button class="b b1" id="btnS" onclick="toggle()">시작</button>
       <button class="b b3" onclick="resetTimer()">리셋</button>
-      <button class="b" style="background:rgba(167,139,250,.15);color:var(--p);border:1px solid rgba(167,139,250,.25);" onclick="openPip()">⧉ PIP</button>
+      <input type="number" id="startDelaySec" min="1" max="60" value="5" style="width:36px;background:var(--bg);border:1px solid var(--brd);color:var(--y);border-radius:5px;padding:4px;font-family:'JetBrains Mono',monospace;font-size:11px;text-align:center;">
+      <button class="b" style="background:rgba(255,212,59,.1);color:var(--y);border:1px solid rgba(255,212,59,.25);" onclick="delayedStart()">⏳ 초 후</button>
+      <button class="b" style="background:rgba(177,151,252,.15);color:var(--p);border:1px solid rgba(177,151,252,.25);" onclick="openPip()">⧉ PIP</button>
     </div>
   </div>
   <div class="tadj" id="tadjBar">
@@ -245,6 +259,18 @@ body{background:var(--bg);color:var(--t);font-family:'Noto Sans KR',sans-serif;h
     <label><span style="color:var(--td)">속도</span><input type="range" class="vol" id="ttsRate" min="50" max="300" value="160"></label>
     <label><input type="checkbox" id="chkPreTts"> 📢 2초전</label>
     <label><input type="checkbox" id="chkLoop"> 🔄 자동 루프</label>
+    <span style="color:var(--brd);">|</span>
+    <label><span style="color:var(--td)">지연</span><input type="number" id="delayVal" min="0" max="30" step="0.5" value="0" style="width:40px;background:var(--bg);border:1px solid var(--brd);color:var(--y);border-radius:4px;padding:2px 4px;font-family:'JetBrains Mono',monospace;font-size:11px;text-align:center;" onchange="applyDelay()"><span style="color:var(--td)">초</span></label>
+  </div>
+  <div class="origin-bar" id="originBar" style="display:none;">
+    <div class="origin-inner">
+      <span class="origin-icon">🌟</span>
+      <span class="origin-label">오리진</span>
+      <span class="origin-cd" id="originCd">--</span>
+      <div class="origin-pg"><div class="origin-pg-b" id="originPgB"></div></div>
+      <button class="origin-btn" id="originBtn" onclick="toggleOrigin()">시작</button>
+      <button class="origin-btn origin-reset" onclick="resetOrigin()">리셋</button>
+    </div>
   </div>
   <div class="pg-w"><div class="pg-b" id="pgBar"></div></div>
   <div class="tl-w" id="tlWrap"></div>
@@ -481,8 +507,6 @@ function switchTab(tab){
   document.getElementById('pageBuild').classList.toggle('on',tab==='build');
   document.getElementById('pageTimer').classList.toggle('on',tab==='timer');
   if(tab==='timer'){
-    if(activePreset==='custom'){load();}
-    else{selectPreset(activePreset);}
     document.getElementById('presetSelect').value=activePreset;
     buildTimerView();
   }
@@ -666,6 +690,8 @@ function toggle(){
   } else {
     running=true;
     document.getElementById('btnS').textContent='일시정지';document.getElementById('btnS').className='b b2';
+    // Auto-start origin if not running
+    if(!originRunning){toggleOrigin();}
     startRef=performance.now()-tMs;
     iv=setInterval(()=>{
       tMs=performance.now()-startRef;
@@ -682,6 +708,27 @@ function toggle(){
       updateTimer();
     },100);
   }
+}
+
+// Delayed start
+function delayedStart(){
+  const sec=parseInt(document.getElementById('startDelaySec').value)||5;
+  let remain=sec;
+  document.getElementById('btnS').disabled=true;
+  document.getElementById('btnS').textContent=remain+'초 후 시작';
+  document.getElementById('btnS').className='b b2';
+  const ci=setInterval(()=>{
+    remain--;
+    if(remain<=0){
+      clearInterval(ci);
+      document.getElementById('btnS').disabled=false;
+      toggle();
+    } else {
+      document.getElementById('btnS').textContent=remain+'초 후 시작';
+      if(remain<=3)beep(440,0.05);
+    }
+  },1000);
+  beep(440,0.05);
 }
 function resetTimer(){
   clearInterval(iv);running=false;tMs=0;firedSet.clear();
@@ -768,19 +815,100 @@ async function openPip(){
   setInterval(()=>{if(!pipWin||pipWin.closed)pipWin=null;},1000);
 }
 
+// ===== DELAY =====
+function applyDelay(){
+  const d=parseFloat(document.getElementById('delayVal').value)||0;
+  try{localStorage.setItem('build_delay',d);}catch(e){}
+  // Recalculate preset durations with delay
+  if(activePreset!=='custom'){
+    const p=PRESET_DATA[activePreset];
+    if(p){
+      phases=JSON.parse(JSON.stringify(p.phases));
+      phases.forEach(ph=>{ph.duration=ph.duration+d;});
+      buildTimerView();
+    }
+  }
+}
+try{const sd=localStorage.getItem('build_delay');if(sd)document.getElementById('delayVal').value=sd;}catch(e){}
+
+// ===== ORIGIN TRACKER =====
+let originCd=338.4; // default 0쿨뚝
+let originMs=0,originRunning=false,originIv=null,originStartRef=0;
+
+const ORIGIN_CD={p0:338.4,p2:336.4,p5:333.4,boost:338.4,custom:338.4};
+
+function getOriginCd(){
+  return ORIGIN_CD[activePreset]||338.4;
+}
+
+function showOriginBar(){
+  const bar=document.getElementById('originBar');
+  if(bar)bar.style.display='block';
+  originCd=getOriginCd();
+}
+
+function toggleOrigin(){
+  if(originRunning){
+    clearInterval(originIv);originRunning=false;
+    document.getElementById('originBtn').textContent='재개';
+    document.getElementById('originBtn').classList.remove('running');
+  } else {
+    originRunning=true;
+    document.getElementById('originBtn').textContent='정지';
+    document.getElementById('originBtn').classList.add('running');
+    originStartRef=performance.now()-originMs;
+    originIv=setInterval(()=>{
+      originMs=performance.now()-originStartRef;
+      const total=originCd*1000;
+      if(originMs>=total){
+        originMs=0;originStartRef=performance.now();
+        beep(660,0.15);speak('오리진 쿨 완료');
+      }
+      updateOriginDisplay();
+    },200);
+  }
+}
+
+function resetOrigin(){
+  clearInterval(originIv);originRunning=false;originMs=0;
+  document.getElementById('originBtn').textContent='시작';
+  document.getElementById('originBtn').classList.remove('running');
+  originCd=getOriginCd();
+  updateOriginDisplay();
+}
+
+function updateOriginDisplay(){
+  const remain=Math.max(0,originCd-originMs/1000);
+  const el=document.getElementById('originCd');
+  const pg=document.getElementById('originPgB');
+  if(!el)return;
+  const m=Math.floor(remain/60);
+  const s=Math.floor(remain%60);
+  const totalSec=Math.ceil(remain);
+  if(remain>=60){
+    el.textContent=`${m}:${String(s).padStart(2,'0')} (${totalSec}s)`;
+  } else {
+    el.textContent=remain<10?remain.toFixed(1)+'s':totalSec+'s';
+  }
+  if(pg)pg.style.width=((originMs/1000)/originCd*100)+'%';
+}
+
+// Show origin bar on init
+// Show origin bar on init - moved to INIT section below
+
 // ===== PRESETS =====
 const PRESET_DATA = {
   p0: {name:'극딜 (0쿨뚝/메르250)',phases:[{name:'🔥 극딜 사이클 (0쿨뚝)',icon:'',mode:'countup',duration:112.8,steps:[
-    {t:0,skills:[{name:'극딜 시작',color:'red'}],note:''},
-    {t:56.4,skills:[{name:'준극 시작',color:'orange'}],note:''}
+    {t:0,skills:[{name:'극딜 시작',color:'red'}],note:'극딜'},
+    {t:56.4,skills:[{name:'준극 시작',color:'orange'}],note:'준극'}
   ]}]},
   p2: {name:'극딜 (2쿨뚝/메르250)',phases:[{name:'🔥 극딜 사이클 (2쿨뚝)',icon:'',mode:'countup',duration:110.8,steps:[
-    {t:0,skills:[{name:'극딜 시작',color:'red'}],note:''},
-    {t:54.4,skills:[{name:'준극 시작',color:'orange'}],note:''}
+    {t:0,skills:[{name:'극딜 시작',color:'red'}],note:'극딜'},
+    {t:54.4,skills:[{name:'준극 시작',color:'orange'}],note:'준극'}
   ]}]},
   p5: {name:'극딜 (5쿨뚝/메르250)',phases:[{name:'🔥 극딜 사이클 (5쿨뚝)',icon:'',mode:'countup',duration:107.8,steps:[
-    {t:0,skills:[{name:'극딜 시작',color:'red'}],note:''},
-    {t:51.4,skills:[{name:'준극 시작',color:'orange'}],note:''}
+    {t:0,skills:[{name:'극딜 시작',color:'red'}],note:'극딜'},
+    {t:51.4,skills:[{name:'준극 시작',color:'orange'}],note:'준극'}
   ]}]},
   boost: {name:'부스트 콜 (110초)',phases:[{name:'🚀 부스트 콜',icon:'',mode:'countup',duration:110,steps:[
     {t:0,skills:[{name:'부스트 콜',color:'orange'}],note:''}
@@ -806,7 +934,13 @@ function selectPreset(val){
     if(!p){activePreset='custom';load();renderBuild();buildTimerView();return;}
     buildName=p.name;
     phases=JSON.parse(JSON.stringify(p.phases));
+    // Apply delay
+    const delay=parseFloat(document.getElementById('delayVal').value)||0;
+    if(delay>0){phases.forEach(ph=>{ph.duration=ph.duration+delay;});}
   }
+  // Update origin cd
+  originCd=getOriginCd();
+  updateOriginDisplay();
   // Sync both dropdowns
   const ts=document.getElementById('presetSelect');
   const bs=document.getElementById('buildPresetSelect');
@@ -820,7 +954,7 @@ function selectPreset(val){
 if('speechSynthesis' in window){speechSynthesis.onvoiceschanged=()=>loadVoices();setTimeout(()=>{if(!document.getElementById('voiceSelect').options.length)loadVoices();},500);}
 
 // ===== INIT =====
-load();renderBuild();
+load();renderBuild();showOriginBar();updateOriginDisplay();
 </script>
 </body>
 </html>
