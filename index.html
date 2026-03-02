@@ -468,7 +468,7 @@ function switchTab(tab){
 }
 
 // ===== TIMER =====
-let iv=null,tMs=0,running=false,firedSet=new Set(),pipWin=null;
+let iv=null,tMs=0,running=false,firedSet=new Set(),pipWin=null,startRef=0;
 let flatSteps=[]; // flattened for timer: [{elapsed,skills:[{name,color}],note,phaseName}]
 let totalDur=0;
 
@@ -645,9 +645,9 @@ function toggle(){
   } else {
     running=true;
     document.getElementById('btnS').textContent='일시정지';document.getElementById('btnS').className='b b2';
-    const st=performance.now()-tMs;
+    startRef=performance.now()-tMs;
     iv=setInterval(()=>{
-      tMs=performance.now()-st;
+      tMs=performance.now()-startRef;
       if(tMs>=totalDur*1000){
         if(document.getElementById('chkLoop').checked){
           clearInterval(iv);running=false;tMs=0;firedSet.clear();speechSynthesis?.cancel();
@@ -671,6 +671,7 @@ function resetTimer(){
 
 function adjTime(sec){
   tMs=Math.max(0,Math.min(totalDur*1000,tMs+sec*1000));
+  if(running) startRef=performance.now()-tMs;
   // Re-check fired steps
   firedSet.clear();
   const e=tMs/1000;
@@ -678,7 +679,7 @@ function adjTime(sec){
     if(e>=st.elapsed+1)firedSet.add(`s-${i}`);
     if(e>=st.elapsed-1)firedSet.add(`p-${i}`);
   });
-  if(!running){updateTimer();}
+  updateTimer();
 }
 
 // ===== KEYBINDS =====
