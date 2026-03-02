@@ -94,6 +94,15 @@ body{background:var(--bg);color:var(--t);font-family:'Noto Sans KR',sans-serif;h
 
 .ctrls{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
 
+.tadj{flex-shrink:0;background:rgba(255,255,255,.02);border-bottom:1px solid var(--brd);padding:4px 14px;display:flex;align-items:center;justify-content:center;gap:4px;}
+.tadj-btn{background:var(--bg);border:1px solid var(--brd);border-radius:5px;padding:3px 7px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;}
+.tadj-btn:active{transform:scale(.92);}
+.tadj-btn.minus{color:var(--r);border-color:rgba(248,113,113,.25);}
+.tadj-btn.minus:hover{background:rgba(248,113,113,.1);}
+.tadj-btn.plus{color:var(--g);border-color:rgba(74,222,128,.25);}
+.tadj-btn.plus:hover{background:rgba(74,222,128,.1);}
+.tadj-lbl{font-size:9px;color:var(--tm);font-family:'Outfit',sans-serif;font-weight:700;margin:0 2px;}
+
 .sbar{flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--brd);padding:5px 14px;display:flex;align-items:center;gap:10px;font-size:11px;overflow-x:auto;}
 .sbar label{display:flex;align-items:center;gap:4px;color:var(--td);cursor:pointer;white-space:nowrap;}
 .sbar input[type=checkbox]{accent-color:var(--ac);width:13px;height:13px;}
@@ -201,6 +210,17 @@ body{background:var(--bg);color:var(--t);font-family:'Noto Sans KR',sans-serif;h
       <button class="b" style="background:rgba(167,139,250,.15);color:var(--p);border:1px solid rgba(167,139,250,.25);" onclick="openPip()">⧉ PIP</button>
     </div>
   </div>
+  <div class="tadj" id="tadjBar">
+    <button class="tadj-btn minus" onclick="adjTime(-10)">-10</button>
+    <button class="tadj-btn minus" onclick="adjTime(-5)">-5</button>
+    <button class="tadj-btn minus" onclick="adjTime(-3)">-3</button>
+    <button class="tadj-btn minus" onclick="adjTime(-1)">-1</button>
+    <span class="tadj-lbl">⏱️</span>
+    <button class="tadj-btn plus" onclick="adjTime(1)">+1</button>
+    <button class="tadj-btn plus" onclick="adjTime(3)">+3</button>
+    <button class="tadj-btn plus" onclick="adjTime(5)">+5</button>
+    <button class="tadj-btn plus" onclick="adjTime(10)">+10</button>
+  </div>
   <div class="sbar">
     <label><input type="checkbox" id="chkBeep" checked> 🔔 비프</label>
     <input type="range" class="vol" id="volBeep" min="0" max="100" value="50">
@@ -210,6 +230,7 @@ body{background:var(--bg);color:var(--t);font-family:'Noto Sans KR',sans-serif;h
     <button class="test-btn" onclick="testVoice()">테스트</button>
     <label><span style="color:var(--td)">속도</span><input type="range" class="vol" id="ttsRate" min="50" max="300" value="160"></label>
     <label><input type="checkbox" id="chkPreTts"> 📢 2초전</label>
+    <label><input type="checkbox" id="chkLoop"> 🔄 자동 루프</label>
   </div>
   <div class="pg-w"><div class="pg-b" id="pgBar"></div></div>
   <div class="tl-w" id="tlWrap"></div>
@@ -253,8 +274,25 @@ body{background:#0a0e14;color:#e2e8f0;font-family:'Noto Sans KR',sans-serif;disp
 .pnxl{font-size:8px;font-weight:700;color:#475569;text-transform:uppercase;}
 .pnxs{display:flex;gap:2px;flex-wrap:wrap;}
 .pnxt{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#38bdf8;margin-left:auto;}
+.ptadj{display:flex;align-items:center;justify-content:center;gap:3px;padding:3px 6px;background:rgba(255,255,255,.02);border-bottom:1px solid #1e2a3a;}
+.ptadj button{background:#0a0e14;border:1px solid #1e2a3a;border-radius:4px;padding:2px 5px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;cursor:pointer;}
+.ptadj button:active{transform:scale(.9);}
+.ptadj .pm{color:#f87171;border-color:rgba(248,113,113,.25);}
+.ptadj .pp2{color:#4ade80;border-color:rgba(74,222,128,.25);}
+.ptadj .plbl{font-size:7px;color:#475569;margin:0 1px;}
 </style>
 <div class="ph"><div><div class="pp" id="pipPh">준비</div><div class="pt" id="pipTm">--</div></div></div>
+<div class="ptadj" id="pipAdj">
+  <button class="pm" onclick="(window.adjTime||window.opener?.adjTime)(-10)">-10</button>
+  <button class="pm" onclick="(window.adjTime||window.opener?.adjTime)(-5)">-5</button>
+  <button class="pm" onclick="(window.adjTime||window.opener?.adjTime)(-3)">-3</button>
+  <button class="pm" onclick="(window.adjTime||window.opener?.adjTime)(-1)">-1</button>
+  <span class="plbl">⏱️</span>
+  <button class="pp2" onclick="(window.adjTime||window.opener?.adjTime)(1)">+1</button>
+  <button class="pp2" onclick="(window.adjTime||window.opener?.adjTime)(3)">+3</button>
+  <button class="pp2" onclick="(window.adjTime||window.opener?.adjTime)(5)">+5</button>
+  <button class="pp2" onclick="(window.adjTime||window.opener?.adjTime)(10)">+10</button>
+</div>
 <div class="ppg"><div class="ppg-b" id="pipPg"></div></div>
 <div class="pb" id="pipBd"></div>
 <div class="pnx" id="pipNx"><div class="pnxi"><div class="pnxl">NEXT</div><div class="pnxs" id="pipNxSk"></div><div class="pnxt" id="pipNxTm"></div></div></div>
@@ -610,7 +648,16 @@ function toggle(){
     const st=performance.now()-tMs;
     iv=setInterval(()=>{
       tMs=performance.now()-st;
-      if(tMs>=totalDur*1000){tMs=totalDur*1000;clearInterval(iv);running=false;document.getElementById('btnS').textContent='완료';document.getElementById('btnS').disabled=true;}
+      if(tMs>=totalDur*1000){
+        if(document.getElementById('chkLoop').checked){
+          clearInterval(iv);running=false;tMs=0;firedSet.clear();speechSynthesis?.cancel();
+          document.getElementById('btnS').textContent='시작';document.getElementById('btnS').className='b b1';document.getElementById('btnS').disabled=false;
+          buildTimerView();
+          setTimeout(()=>toggle(),50);
+          return;
+        }
+        tMs=totalDur*1000;clearInterval(iv);running=false;document.getElementById('btnS').textContent='완료';document.getElementById('btnS').disabled=true;
+      }
       updateTimer();
     },100);
   }
@@ -620,6 +667,18 @@ function resetTimer(){
   speechSynthesis?.cancel();
   document.getElementById('btnS').textContent='시작';document.getElementById('btnS').className='b b1';document.getElementById('btnS').disabled=false;
   buildTimerView();
+}
+
+function adjTime(sec){
+  tMs=Math.max(0,Math.min(totalDur*1000,tMs+sec*1000));
+  // Re-check fired steps
+  firedSet.clear();
+  const e=tMs/1000;
+  flatSteps.forEach((st,i)=>{
+    if(e>=st.elapsed+1)firedSet.add(`s-${i}`);
+    if(e>=st.elapsed-1)firedSet.add(`p-${i}`);
+  });
+  if(!running){updateTimer();}
 }
 
 // ===== KEYBINDS =====
@@ -643,7 +702,7 @@ document.addEventListener('keydown',e=>{
     else if(e.code==='Delete'||e.code==='Backspace'){binds[recKey]='none';}
     else{binds[recKey]=e.code;}
     try{localStorage.setItem('build_binds',JSON.stringify(binds));}catch(x){}
-    renderKeysModal();recKey=null;return;
+    recKey=null;renderKeysModal();return;
   }
   if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
   if(binds.toggle!=='none'&&e.code===binds.toggle){e.preventDefault();toggle();}
@@ -671,6 +730,7 @@ async function openPip(){
       pipWin=await documentPictureInPicture.requestWindow({width:300,height:460});
       const fl=pipWin.document.createElement('link');fl.href='https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Outfit:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap';fl.rel='stylesheet';pipWin.document.head.appendChild(fl);
       pipWin.document.body.appendChild(document.getElementById('pipTpl').content.cloneNode(true));
+      pipWin.adjTime=adjTime;
       renderPipList(pipWin.document);updateTimer();
       pipWin.addEventListener('pagehide',()=>{pipWin=null;});return;
     }catch(e){}
