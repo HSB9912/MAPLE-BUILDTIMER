@@ -1,95 +1,1133 @@
-# 🎮 메이플 빌드 타이머 업데이트 내역
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>메이플 빌드 타이머</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Outfit:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c0f15;--bg2:#141821;--bg3:#1c2230;--brd:#252d3d;
+  --t:#e8ecf4;--td:#8892a4;--tm:#5c6678;
+  --ac:#5cb8ff;--acg:rgba(92,184,255,0.12);
+  --r:#ff6b6b;--g:#51cf66;--y:#ffd43b;--p:#b197fc;--o:#ff922b;--pk:#f783ac;--cy:#3bc9db;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--t);font-family:'Noto Sans KR',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;user-select:none;}
 
----
+/* TABS */
+.tabs{flex-shrink:0;display:flex;border-bottom:1px solid var(--brd);background:#10131a;}
+.tab{flex:1;padding:11px;text-align:center;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:var(--tm);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.3px;}
+.tab.on{color:var(--ac);border-bottom-color:var(--ac);background:rgba(92,184,255,.04);}
+.tab:hover{color:var(--t);}
 
-## 🔗 사이트 바로가기
+/* PAGES */
+.page{flex:1;display:none;flex-direction:column;overflow:hidden;}
+.page.on{display:flex;}
 
-**https://hsb9912.github.io/MAPLE-BUILDTIMER/**
+/* ===== BUILD PAGE ===== */
+.build-top{flex-shrink:0;padding:12px 14px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--bg);}
+.build-top input{background:var(--bg2);border:1px solid var(--brd);color:var(--t);border-radius:8px;padding:7px 12px;font-size:14px;font-family:'Noto Sans KR',sans-serif;flex:1;min-width:150px;}
+.build-top input::placeholder{color:var(--tm);}
+.build-scroll{flex:1;overflow-y:auto;padding:10px 14px 100px;}
+.build-scroll::-webkit-scrollbar{width:4px;}
+.build-scroll::-webkit-scrollbar-thumb{background:var(--brd);border-radius:2px;}
 
-> 기존 첨부파일(HTML)은 삭제했습니다. 위 사이트에서 바로 이용하세요!
-> PC 브라우저에서 접속 → PIP 모드로 메이플 위에 띄워서 사용하시면 됩니다.
+.b{font-family:'Outfit',sans-serif;font-weight:700;font-size:12px;border:none;border-radius:7px;padding:7px 13px;cursor:pointer;transition:all .15s;letter-spacing:.3px;}
+.b:active{transform:scale(.95);}
+.b1{background:var(--ac);color:#0c0f15;}
+.b2{background:var(--y);color:#0c0f15;}
+.b3{background:rgba(255,255,255,.07);color:var(--td);border:1px solid var(--brd);}
+.b4{background:rgba(255,107,107,.1);color:var(--r);border:1px solid rgba(255,107,107,.2);}
+.b5{background:rgba(81,207,102,.1);color:var(--g);border:1px solid rgba(81,207,102,.2);}
+.bsm{padding:4px 8px;font-size:11px;border-radius:5px;}
 
----
+/* PHASE BLOCK */
+.phase-block{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+.phase-head{display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--brd);cursor:grab;}
+.phase-head:active{cursor:grabbing;}
+.phase-head input{background:transparent;border:none;color:var(--t);font-size:14px;font-weight:700;font-family:'Outfit',sans-serif;flex:1;outline:none;}
+.phase-head input::placeholder{color:var(--tm);}
+.phase-head .drag{color:var(--tm);font-size:14px;cursor:grab;}
+.phase-body{padding:8px 10px;}
 
-## ++ 추가 기능
+/* STEP ROW */
+.step{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:6px;margin-bottom:4px;background:rgba(255,255,255,.02);border:1px solid transparent;transition:background .2s;}
+.step:hover{background:rgba(255,255,255,.04);}
+.step-time{width:58px;}
+.step-time input{width:100%;background:var(--bg);border:1px solid var(--brd);color:var(--ac);border-radius:5px;padding:4px 6px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;text-align:center;}
+.step-skills{flex:1;display:flex;flex-wrap:wrap;gap:3px;align-items:center;}
+.step-skill{display:flex;align-items:center;gap:2px;border-radius:5px;padding:3px 4px 3px 8px;font-size:11px;font-weight:700;white-space:nowrap;}
+.step-skill input{background:transparent;border:none;color:inherit;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;width:auto;outline:none;min-width:30px;}
+.step-skill .sk-del{background:none;border:none;color:inherit;opacity:.5;cursor:pointer;font-size:10px;padding:0 2px;}
+.step-skill .sk-del:hover{opacity:1;}
+.step-note input{background:transparent;border:1px dashed var(--brd);color:var(--y);border-radius:4px;padding:2px 6px;font-size:10px;width:100px;font-family:'Noto Sans KR',sans-serif;outline:none;}
+.step-note input::placeholder{color:var(--tm);}
+.step-btns{display:flex;gap:3px;flex-shrink:0;}
 
-### 📂 빌드 다중 슬롯
+.add-skill-btn{background:rgba(92,184,255,.08);border:1px dashed rgba(92,184,255,.3);color:var(--ac);border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;white-space:nowrap;}
+.add-skill-btn:hover{background:rgba(92,184,255,.15);}
 
-빌드를 여러 개 만들어서 관리할 수 있습니다.
-더 이상 내보내기/가져오기 반복할 필요 없이 드롭다운에서 바로 전환!
+.add-step{padding:6px;text-align:center;}
 
-- 📂 버튼으로 빌드 목록 모달 열기
-- 새 빌드 추가 / 이름변경 / 복제 / 삭제
-- 드롭다운에서 내 빌드 + 프리셋 한눈에 선택
-- JSON 가져오기 시 새 슬롯으로 자동 추가 (기존 빌드 안 건드림)
-- 기존 데이터 자동 마이그레이션
+/* COLOR PICKER */
+.color-sel{position:relative;}
+.color-dot{width:14px;height:14px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,.15);flex-shrink:0;}
+.color-pop{position:absolute;top:24px;left:0;background:var(--bg2);border:1px solid var(--brd);border-radius:8px;padding:6px;display:none;flex-wrap:wrap;gap:4px;z-index:20;width:120px;}
+.color-pop.show{display:flex;}
+.color-opt{width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border .15s;}
+.color-opt:hover{border-color:white;}
 
-### 🔥 극딜/준극 프리셋 내장 (범용)
+/* IMPORT/EXPORT */
+.io-bar{flex-shrink:0;padding:8px 14px;border-top:1px solid var(--brd);background:var(--bg);display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.io-bar .info{font-size:11px;color:var(--tm);margin-right:auto;}
 
-메르세데스 유니온 기준, 쿨뚝별 극딜 사이클 타이머가 내장되어 있습니다.
-드롭다운에서 바로 선택 가능!
+/* ===== TIMER PAGE ===== */
+.timer-top{flex-shrink:0;background:linear-gradient(180deg,#10131a 0%,var(--bg) 100%);border-bottom:1px solid var(--brd);padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:10;}
+.timer-sec{text-align:center;}
+.ph{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--tm);font-family:'Outfit',sans-serif;margin-bottom:2px;}
+.ph.on{color:var(--ac);}
+.td{font-family:'JetBrains Mono',monospace;font-size:56px;font-weight:700;color:var(--ac);line-height:1;min-width:120px;text-shadow:0 0 30px rgba(92,184,255,0.25);letter-spacing:-1px;}
+.td.pre{color:var(--y);text-shadow:0 0 30px rgba(255,212,59,0.25);}
+.td.setup{color:var(--cy);}
+.td.end{color:var(--r);text-shadow:0 0 30px rgba(255,107,107,0.25);}
 
-| 프리셋 | 극딜 시작 | 준극 시작 (엔버링크) | 사이클 길이 |
-|--------|----------|-------------------|-----------|
-| 0쿨뚝 | 0초 | 56.4초 | 112.8초 |
-| 2쿨뚝 | 0초 | 54.4초 | 110.8초 |
-| 5쿨뚝 | 0초 | 51.4초 | 107.8초 |
+.ctrls{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
 
-- 준극 기준 = 엔버링크 초기화 시점 (소컨 2회차)
-- 쿨타임 공식: (기본쿨 × (1 - 메르%)) - 쿨뚝
+.tadj{flex-shrink:0;background:rgba(255,255,255,.015);border-bottom:1px solid var(--brd);padding:5px 14px;display:flex;align-items:center;justify-content:center;gap:3px;}
+.tadj-btn{background:var(--bg2);border:1px solid var(--brd);border-radius:5px;padding:4px 8px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;}
+.tadj-btn:active{transform:scale(.92);}
+.tadj-btn.minus{color:#ff8787;border-color:rgba(255,107,107,.2);}
+.tadj-btn.minus:hover{background:rgba(255,107,107,.08);border-color:rgba(255,107,107,.4);}
+.tadj-btn.plus{color:#69db7c;border-color:rgba(81,207,102,.2);}
+.tadj-btn.plus:hover{background:rgba(81,207,102,.08);border-color:rgba(81,207,102,.4);}
+.tadj-lbl{font-size:9px;color:var(--tm);font-family:'Outfit',sans-serif;font-weight:700;margin:0 4px;}
 
-### 🚀 부스트 콜 타이머
+.sbar{flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--brd);padding:6px 14px;display:flex;align-items:center;gap:10px;font-size:11px;overflow-x:auto;}
+.sbar label{display:flex;align-items:center;gap:4px;color:var(--td);cursor:pointer;white-space:nowrap;}
+.sbar input[type=checkbox]{accent-color:var(--ac);width:13px;height:13px;}
+.sbar .vol{width:50px;accent-color:var(--ac);}
+.sbar select{background:var(--bg);border:1px solid var(--brd);color:var(--t);border-radius:5px;padding:2px 4px;font-size:10px;max-width:140px;}
+.sbar .test-btn{background:rgba(92,184,255,.1);border:1px solid rgba(92,184,255,.25);color:var(--ac);border-radius:5px;padding:2px 7px;font-size:10px;cursor:pointer;white-space:nowrap;}
 
-110초 루프 부스트 콜 전용 타이머.
+.pg-w{flex-shrink:0;height:3px;background:rgba(255,255,255,.03);}
+.pg-b{height:100%;background:linear-gradient(90deg,var(--ac),var(--p));width:0%;transition:width .3s linear;border-radius:0 2px 2px 0;}
 
-### 🌟 오리진 쿨타임 트래커
+.origin-bar{flex-shrink:0;background:rgba(255,146,43,.04);border-bottom:1px solid rgba(255,146,43,.15);padding:6px 14px;}
+.origin-inner{display:flex;align-items:center;gap:8px;}
+.origin-icon{font-size:14px;}
+.origin-label{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;color:var(--o);letter-spacing:.3px;}
+.origin-cd{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--o);min-width:50px;text-shadow:0 0 12px rgba(255,146,43,.2);}
+.origin-pg{flex:1;height:3px;background:rgba(255,255,255,.04);border-radius:2px;overflow:hidden;}
+.origin-pg-b{height:100%;background:linear-gradient(90deg,var(--o),var(--y));width:0%;transition:width .5s linear;border-radius:2px;}
+.origin-btn{background:rgba(255,146,43,.1);border:1px solid rgba(255,146,43,.25);color:var(--o);border-radius:5px;padding:3px 8px;font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;cursor:pointer;}
+.origin-btn:hover{background:rgba(255,146,43,.2);}
+.origin-btn.origin-reset{color:var(--td);border-color:var(--brd);background:rgba(255,255,255,.04);}
+.origin-btn.running{background:rgba(255,212,59,.12);color:var(--y);border-color:rgba(255,212,59,.3);}
 
-극딜 사이클과 별도로 오리진(6분 쿨) 남은 시간을 실시간 표시합니다.
+.origin-cfg{flex-shrink:0;padding:8px 14px;border-bottom:1px solid var(--brd);background:rgba(255,146,43,.03);display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:11px;}
+.origin-cfg-chk{display:flex;align-items:center;gap:5px;color:var(--o);font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;}
+.origin-cfg-chk input{accent-color:var(--o);width:14px;height:14px;}
+.origin-cfg-fields{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.origin-cfg-fields label{display:flex;align-items:center;gap:4px;color:var(--td);white-space:nowrap;}
+.origin-cfg-result{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--o);}
 
-- 빌드 편집 탭에서 오리진 ON/OFF 설정
-- 메르 레벨 (0/120/180/200/250) + 쿨뚝 (0~10초) 직접 입력
-- 자동 쿨타임 계산 + 결과 표시
-- 분:초 + 총 초수 동시 표시 (예: 3:42 (222s))
-- 쿨 완료 시 비프음 + "오리진 쿨 완료" 음성 알림
-- 무한 루프 (자동 리셋)
-- 메인 타이머 시작 시 오리진도 자동 시작
-- 설정값 브라우저에 저장 (새로고침해도 유지)
+.tl-w{flex:1;overflow-y:auto;padding:8px 12px 100px;scroll-behavior:smooth;}
+.tl-w::-webkit-scrollbar{width:3px;}
+.tl-w::-webkit-scrollbar-thumb{background:var(--brd);border-radius:2px;}
 
-### 🔄 자동 루프
+.sdv{display:flex;align-items:center;gap:8px;padding:14px 4px 6px;font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:1.5px;}
+.sdv::after{content:'';flex:1;height:1px;background:var(--brd);}
 
-사이클 끝나면 자동으로 처음부터 다시 시작.
-메이플 창 위에 올려두고 키 안 눌러도 계속 반복됩니다.
+.tl{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;margin-bottom:3px;border:1px solid transparent;transition:all .25s;}
+.tl.active{background:rgba(92,184,255,.06);border-color:rgba(92,184,255,.35);box-shadow:0 0 20px rgba(92,184,255,.08),inset 0 0 20px rgba(92,184,255,.04);transform:scale(1.01);}
+.tl.active .tt{color:var(--ac);}
+.tl.done{opacity:.25;}
+.tl.upcoming{opacity:.55;}
 
-### ⏳ N초 후 시작
+.tt{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--td);min-width:48px;text-align:right;flex-shrink:0;}
+.ts{display:flex;flex-wrap:wrap;align-items:center;gap:5px;flex:1;}
+.sk{display:inline-flex;font-size:12px;font-weight:700;padding:4px 10px;border-radius:6px;white-space:nowrap;letter-spacing:.2px;}
+.aw{color:var(--tm);font-size:11px;}
+.tn{font-size:10px;color:var(--y);padding-left:58px;margin-bottom:3px;font-weight:500;}
 
-입장 전에 미리 타이머를 세팅하고, 설정한 초(기본 5초) 뒤에 자동 시작.
-3초 전부터 비프음으로 카운트다운.
+.nb{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(0deg,var(--bg) 65%,transparent);padding:30px 14px 12px;z-index:5;display:none;}
+.nb.on{display:block;}
+.ni{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;backdrop-filter:blur(8px);}
+.nl{font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--tm);}
+.ns{display:flex;flex-wrap:wrap;gap:4px;}
+.nt{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:16px;color:var(--ac);margin-left:auto;}
 
-### ⏱️ 시간 수동 조절
+/* KEYBIND MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-bg.show{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--brd);border-radius:14px;width:90%;max-width:500px;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;}
+.modal-head{padding:12px 16px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;}
+.modal-head h2{font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;}
+.modal-close{background:none;border:none;color:var(--td);font-size:18px;cursor:pointer;}
+.modal-body{flex:1;overflow-y:auto;padding:12px 16px;}
+.modal-foot{padding:10px 16px;border-top:1px solid var(--brd);display:flex;gap:8px;justify-content:flex-end;}
+.kb-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.kb-label{font-size:13px;color:var(--t);min-width:100px;}
+.kb-btn{background:var(--bg);border:1px solid var(--brd);color:var(--ac);border-radius:6px;padding:5px 12px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;cursor:pointer;min-width:80px;text-align:center;}
+.kb-btn.rec{border-color:var(--r);color:var(--r);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
 
-쿨이 밀리거나 당겨질 때 -10 / -5 / -3 / -1 / +1 / +3 / +5 / +10 버튼으로 수동 조정.
-PIP 창에서도 조절 가능.
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 20px;color:var(--tm);}
+.empty h3{font-family:'Outfit',sans-serif;font-size:18px;color:var(--td);margin-bottom:8px;}
+.empty p{font-size:13px;line-height:1.6;}
 
-### ⏰ 극딜 지연시간 설정
+@media(max-width:500px){
+  .td{font-size:40px;min-width:90px;}
+  .b{padding:5px 10px;font-size:11px;}
+}
+</style>
+</head>
+<body>
 
-사이클 끝나고 바로 극딜 안 누르는 경우를 위한 지연 시간 설정.
-설정한 초만큼 사이클 길이에 자동으로 더해집니다.
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab on" onclick="switchTab('build')">📝 빌드 편집</div>
+  <div class="tab" onclick="switchTab('timer')">⏱️ 타이머</div>
+</div>
 
-### 🎨 디자인 리뉴얼
+<!-- ===== BUILD PAGE ===== -->
+<div class="page on" id="pageBuild">
+  <div class="build-top">
+    <select id="buildPresetSelect" onchange="selectPreset(this.value);" style="background:var(--bg2);border:1px solid var(--brd);color:var(--y);border-radius:6px;padding:5px 8px;font-family:'Noto Sans KR',sans-serif;font-size:11px;font-weight:700;">
+    </select>
+    <button class="b b3 bsm" onclick="openBuilds()" title="빌드 관리">📂</button>
+    <input id="buildName" placeholder="빌드 이름 (예: 에반 수로, 아크 극딜...)" spellcheck="false">
+    <button class="b b5" onclick="addPhase()">+ 구간 추가</button>
+    <button class="b b3" onclick="openKeys()">⌨️ 단축키</button>
+  </div>
+  <div class="origin-cfg" id="originCfg">
+    <label class="origin-cfg-chk"><input type="checkbox" id="chkOrigin" onchange="toggleOriginCfg()"> 🌟 오리진 타이머</label>
+    <div class="origin-cfg-fields" id="originCfgFields" style="display:none;">
+      <label>메르 Lv <select id="mercLv" onchange="calcOriginCd()" style="background:var(--bg);border:1px solid var(--brd);color:var(--ac);border-radius:5px;padding:3px 6px;font-size:11px;">
+        <option value="0">0 (0%)</option>
+        <option value="120">120 (3%)</option>
+        <option value="180">180 (4%)</option>
+        <option value="200">200 (5%)</option>
+        <option value="250" selected>250 (6%)</option>
+      </select></label>
+      <label>쿨뚝 <input type="number" id="originHat" min="0" max="10" step="1" value="0" onchange="calcOriginCd()" style="width:40px;background:var(--bg);border:1px solid var(--brd);color:var(--y);border-radius:4px;padding:3px 5px;font-family:'JetBrains Mono',monospace;font-size:11px;text-align:center;">초</label>
+      <span class="origin-cfg-result" id="originCfgResult">= 338.4초</span>
+    </div>
+  </div>
+  <div class="build-scroll" id="buildScroll">
+    <div class="empty" id="emptyState">
+      <h3>🎮 빌드 타이머</h3>
+      <p>수로, 극딜 등 어떤 빌드든 직접 만들 수 있어요.<br>
+      <b>"+ 구간 추가"</b>로 시작하세요!<br><br>
+      극딜용: 사이클을 구간으로 만들고 단축키로 리셋+시작<br>
+      수로용: 입장 전 → 입장 후 → 본 타이머 구간 세팅</p>
+    </div>
+  </div>
+  <div class="io-bar">
+    <span class="info">💾 빌드는 브라우저에 자동 저장됩니다</span>
+    <button class="b b3 bsm" onclick="exportBuild()">📤 내보내기</button>
+    <button class="b b3 bsm" onclick="importBuild()">📥 가져오기</button>
+    <button class="b b4 bsm" onclick="clearAll()">🗑️ 전체 삭제</button>
+  </div>
+</div>
 
-- 색상 대비 강화 (더 선명한 컬러 팔레트)
-- 타이머 숫자 크기 확대
-- 타임라인 행 간격/패딩 개선
-- 스킬 뱃지 가독성 향상
+<!-- ===== TIMER PAGE ===== -->
+<div class="page" id="pageTimer">
+  <div class="timer-top">
+    <div class="timer-sec">
+      <div class="ph" id="phLabel">준비</div>
+      <div class="td" id="timerD">--</div>
+    </div>
+    <div class="ctrls">
+      <select id="presetSelect" onchange="selectPreset(this.value)" style="background:var(--bg);border:1px solid var(--brd);color:var(--y);border-radius:6px;padding:5px 8px;font-family:'Noto Sans KR',sans-serif;font-size:11px;font-weight:700;max-width:180px;">
+      </select>
+      <button class="b b1" id="btnS" onclick="toggle()">시작</button>
+      <button class="b b3" onclick="resetTimer()">리셋</button>
+      <input type="number" id="startDelaySec" min="1" max="60" value="5" style="width:36px;background:var(--bg);border:1px solid var(--brd);color:var(--y);border-radius:5px;padding:4px;font-family:'JetBrains Mono',monospace;font-size:11px;text-align:center;">
+      <button class="b" style="background:rgba(255,212,59,.1);color:var(--y);border:1px solid rgba(255,212,59,.25);" onclick="delayedStart()">⏳ 초 후</button>
+      <button class="b" style="background:rgba(177,151,252,.15);color:var(--p);border:1px solid rgba(177,151,252,.25);" onclick="openPip()">⧉ PIP</button>
+    </div>
+  </div>
+  <div class="tadj" id="tadjBar">
+    <button class="tadj-btn minus" onclick="adjTime(-10)">-10</button>
+    <button class="tadj-btn minus" onclick="adjTime(-5)">-5</button>
+    <button class="tadj-btn minus" onclick="adjTime(-3)">-3</button>
+    <button class="tadj-btn minus" onclick="adjTime(-1)">-1</button>
+    <span class="tadj-lbl">⏱️</span>
+    <button class="tadj-btn plus" onclick="adjTime(1)">+1</button>
+    <button class="tadj-btn plus" onclick="adjTime(3)">+3</button>
+    <button class="tadj-btn plus" onclick="adjTime(5)">+5</button>
+    <button class="tadj-btn plus" onclick="adjTime(10)">+10</button>
+  </div>
+  <div class="sbar">
+    <label><input type="checkbox" id="chkBeep" checked> 🔔 비프</label>
+    <input type="range" class="vol" id="volBeep" min="0" max="100" value="50">
+    <label><input type="checkbox" id="chkTts" checked> 🗣️ 음성</label>
+    <input type="range" class="vol" id="volTts" min="0" max="100" value="80">
+    <select id="voiceSelect"></select>
+    <button class="test-btn" onclick="testVoice()">테스트</button>
+    <label><span style="color:var(--td)">속도</span><input type="range" class="vol" id="ttsRate" min="50" max="300" value="160"></label>
+    <label><input type="checkbox" id="chkPreTts"> 📢 2초전</label>
+    <label><input type="checkbox" id="chkLoop"> 🔄 자동 루프</label>
+    <span style="color:var(--brd);">|</span>
+    <label><span style="color:var(--td)">지연</span><input type="number" id="delayVal" min="0" max="30" step="0.5" value="0" style="width:40px;background:var(--bg);border:1px solid var(--brd);color:var(--y);border-radius:4px;padding:2px 4px;font-family:'JetBrains Mono',monospace;font-size:11px;text-align:center;" onchange="applyDelay()"><span style="color:var(--td)">초</span></label>
+  </div>
+  <div class="origin-bar" id="originBar" style="display:none;">
+    <div class="origin-inner">
+      <span class="origin-icon">🌟</span>
+      <span class="origin-label">오리진</span>
+      <span class="origin-cd" id="originCd">--</span>
+      <div class="origin-pg"><div class="origin-pg-b" id="originPgB"></div></div>
+      <button class="origin-btn" id="originBtn" onclick="toggleOrigin()">시작</button>
+      <button class="origin-btn origin-reset" onclick="resetOrigin()">리셋</button>
+    </div>
+  </div>
+  <div class="pg-w"><div class="pg-b" id="pgBar"></div></div>
+  <div class="tl-w" id="tlWrap"></div>
+  <div class="nb" id="nextBar"><div class="ni"><div class="nl">NEXT</div><div class="ns" id="nextSk"></div><div class="nt" id="nextTm"></div></div></div>
+</div>
 
----
+<!-- KEYBIND MODAL -->
+<div class="modal-bg" id="keysModal">
+  <div class="modal">
+    <div class="modal-head"><h2>⌨️ 단축키 설정</h2><button class="modal-close" onclick="closeKeys()">✕</button></div>
+    <div class="modal-body" id="keysBody"></div>
+    <div class="modal-foot"><button class="b b1" onclick="closeKeys()">확인</button></div>
+  </div>
+</div>
 
-## 기존 기능
+<!-- BUILDS MODAL -->
+<div class="modal-bg" id="buildsModal">
+  <div class="modal">
+    <div class="modal-head"><h2>📂 내 빌드 목록</h2><button class="modal-close" onclick="closeBuilds()">✕</button></div>
+    <div class="modal-body" id="buildsBody"></div>
+    <div class="modal-foot">
+      <button class="b b5" onclick="addSlot()">+ 새 빌드</button>
+      <button class="b b3" onclick="closeBuilds()">닫기</button>
+    </div>
+  </div>
+</div>
 
-- 커스텀 빌드 생성/편집 (구간별 카운트다운/카운트업)
-- TTS 음성 안내 + 비프음
-- 2초 전 사전 알림
-- PIP(Picture-in-Picture) 모드
-- 단축키 설정 (리셋+자동시작 포함)
-- JSON 내보내기/가져오기
-- 브라우저 자동 저장
+<!-- PIP TEMPLATE -->
+<template id="pipTpl">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0a0e14;color:#e2e8f0;font-family:'Noto Sans KR',sans-serif;display:flex;flex-direction:column;height:100vh;overflow:hidden;user-select:none;}
+.ph{padding:6px 10px;background:#0f1520;border-bottom:1px solid #1e2a3a;display:flex;align-items:center;justify-content:space-between;}
+.pt{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:#38bdf8;text-shadow:0 0 20px rgba(56,189,248,.3);}
+.pt.end{color:#f87171;}
+.pp{font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#475569;}
+.pp.on{color:#38bdf8;}
+.ppg{height:2px;background:rgba(255,255,255,.04);flex-shrink:0;}
+.ppg-b{height:100%;background:linear-gradient(90deg,#38bdf8,#a78bfa);width:0%;}
+.pb{flex:1;overflow-y:auto;padding:4px 6px 40px;scroll-behavior:smooth;}
+.pb::-webkit-scrollbar{width:2px;}.pb::-webkit-scrollbar-thumb{background:#1e2a3a;}
+.pr{display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:6px;margin-bottom:1px;border:1px solid transparent;transition:all .2s;}
+.pr.active{background:#1a2332;border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.15);}
+.pr.done{opacity:.25;}.pr.upcoming{opacity:.5;}
+.pr .pt2{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#64748b;min-width:32px;text-align:right;}
+.pr.active .pt2{color:#38bdf8;}
+.psk{display:flex;flex-wrap:wrap;gap:2px;}
+.pn{font-size:8px;color:#fbbf24;padding-left:38px;margin-bottom:1px;}
+.psd{padding:6px 4px 3px;font-family:'Outfit',sans-serif;font-size:8px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:1px;}
+.pnx{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(0deg,#0a0e14 70%,transparent);padding:16px 6px 6px;display:none;}
+.pnx.on{display:block;}
+.pnxi{background:#131920;border:1px solid #1e2a3a;border-radius:6px;padding:5px 8px;display:flex;align-items:center;gap:5px;}
+.pnxl{font-size:8px;font-weight:700;color:#475569;text-transform:uppercase;}
+.pnxs{display:flex;gap:2px;flex-wrap:wrap;}
+.pnxt{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#38bdf8;margin-left:auto;}
+.ptadj{display:flex;align-items:center;justify-content:center;gap:3px;padding:3px 6px;background:rgba(255,255,255,.02);border-bottom:1px solid #1e2a3a;}
+.ptadj button{background:#0a0e14;border:1px solid #1e2a3a;border-radius:4px;padding:2px 5px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;cursor:pointer;}
+.ptadj button:active{transform:scale(.9);}
+.ptadj .pm{color:#f87171;border-color:rgba(248,113,113,.25);}
+.ptadj .pp2{color:#4ade80;border-color:rgba(74,222,128,.25);}
+.ptadj .plbl{font-size:7px;color:#475569;margin:0 1px;}
+</style>
+<div class="ph"><div><div class="pp" id="pipPh">준비</div><div class="pt" id="pipTm">--</div></div></div>
+<div class="ptadj" id="pipAdj">
+  <button class="pm" onclick="(window.adjTime||window.opener?.adjTime)(-10)">-10</button>
+  <button class="pm" onclick="(window.adjTime||window.opener?.adjTime)(-5)">-5</button>
+  <button class="pm" onclick="(window.adjTime||window.opener?.adjTime)(-3)">-3</button>
+  <button class="pm" onclick="(window.adjTime||window.opener?.adjTime)(-1)">-1</button>
+  <span class="plbl">⏱️</span>
+  <button class="pp2" onclick="(window.adjTime||window.opener?.adjTime)(1)">+1</button>
+  <button class="pp2" onclick="(window.adjTime||window.opener?.adjTime)(3)">+3</button>
+  <button class="pp2" onclick="(window.adjTime||window.opener?.adjTime)(5)">+5</button>
+  <button class="pp2" onclick="(window.adjTime||window.opener?.adjTime)(10)">+10</button>
+</div>
+<div class="ppg"><div class="ppg-b" id="pipPg"></div></div>
+<div class="pb" id="pipBd"></div>
+<div class="pnx" id="pipNx"><div class="pnxi"><div class="pnxl">NEXT</div><div class="pnxs" id="pipNxSk"></div><div class="pnxt" id="pipNxTm"></div></div></div>
+</template>
+
+<script>
+// ===== SKILL COLORS =====
+const COLORS=[
+  {id:'blue',c:'#74b9ff',bg:'rgba(116,185,255,.15)'},
+  {id:'purple',c:'#b197fc',bg:'rgba(177,151,252,.15)'},
+  {id:'orange',c:'#ff922b',bg:'rgba(255,146,43,.12)'},
+  {id:'cyan',c:'#3bc9db',bg:'rgba(59,201,219,.12)'},
+  {id:'red',c:'#ff6b6b',bg:'rgba(255,107,107,.12)'},
+  {id:'green',c:'#51cf66',bg:'rgba(81,207,102,.12)'},
+  {id:'pink',c:'#f783ac',bg:'rgba(247,131,172,.12)'},
+  {id:'yellow',c:'#ffd43b',bg:'rgba(255,212,59,.12)'},
+  {id:'sky',c:'#66d9e8',bg:'rgba(102,217,232,.12)'},
+  {id:'coral',c:'#ff8787',bg:'rgba(255,135,135,.12)'},
+  {id:'gray',c:'#868e96',bg:'rgba(255,255,255,.06)'},
+];
+function getColor(id){return COLORS.find(c=>c.id===id)||COLORS[10];}
+
+// ===== BUILD DATA =====
+// phases: [{name, icon, mode:'countdown'|'countup', duration, steps:[{t, skills:[{name,color}], note}]}]
+let buildName='';
+let phases=[];
+let slots=[];
+let activeSlot=0;
+
+function loadSlots(){
+  try{
+    const d=JSON.parse(localStorage.getItem('build_slots'));
+    if(d&&d.length){slots=d;return;}
+  }catch(e){}
+  try{
+    const old=JSON.parse(localStorage.getItem('build_data'));
+    if(old&&old.phases&&old.phases.length){
+      slots=[{id:Date.now(),name:old.name||'빌드 1',phases:old.phases}];
+      saveSlots();return;
+    }
+  }catch(e){}
+  slots=[{id:Date.now(),name:'빌드 1',phases:[]}];
+  saveSlots();
+}
+function saveSlots(){try{localStorage.setItem('build_slots',JSON.stringify(slots));}catch(e){}}
+
+function save(){
+  if(activePreset!=='custom')return;
+  if(slots[activeSlot]){
+    slots[activeSlot].name=buildName;
+    slots[activeSlot].phases=JSON.parse(JSON.stringify(phases));
+    saveSlots();
+  }
+  updateEmpty();
+}
+function load(){
+  loadSlots();
+  if(activeSlot>=slots.length)activeSlot=0;
+  const s=slots[activeSlot];
+  if(s){buildName=s.name||'';phases=JSON.parse(JSON.stringify(s.phases||[]));}
+  else{buildName='';phases=[];}
+}
+function switchSlot(idx){
+  if(activePreset==='custom'&&slots[activeSlot]){
+    slots[activeSlot].name=buildName;
+    slots[activeSlot].phases=JSON.parse(JSON.stringify(phases));
+    saveSlots();
+  }
+  activeSlot=idx;activePreset='custom';
+  const s=slots[idx];
+  if(s){buildName=s.name||'';phases=JSON.parse(JSON.stringify(s.phases||[]));}
+  renderBuild();buildTimerView();renderBuildDropdowns();
+}
+function addSlot(){
+  const name=prompt('새 빌드 이름:','빌드 '+(slots.length+1));
+  if(!name)return;
+  slots.push({id:Date.now(),name,phases:[]});saveSlots();
+  activeSlot=slots.length-1;activePreset='custom';
+  buildName=name;phases=[];
+  renderBuild();buildTimerView();renderBuildDropdowns();renderBuildsModal();
+}
+function removeSlot(idx){
+  if(slots.length<=1){alert('최소 1개의 빌드는 필요합니다.');return;}
+  if(!confirm('"'+slots[idx].name+'" 삭제할까요?'))return;
+  slots.splice(idx,1);
+  if(activeSlot>=slots.length)activeSlot=slots.length-1;
+  saveSlots();
+  const s=slots[activeSlot];
+  if(s){buildName=s.name||'';phases=JSON.parse(JSON.stringify(s.phases||[]));}
+  renderBuild();buildTimerView();renderBuildDropdowns();renderBuildsModal();
+}
+function renameSlot(idx){
+  const name=prompt('빌드 이름 변경:',slots[idx].name);
+  if(!name)return;
+  slots[idx].name=name;if(idx===activeSlot)buildName=name;
+  saveSlots();renderBuild();renderBuildDropdowns();renderBuildsModal();
+}
+function duplicateSlot(idx){
+  const src=slots[idx];
+  slots.push({id:Date.now(),name:src.name+' (복사)',phases:JSON.parse(JSON.stringify(src.phases))});
+  saveSlots();renderBuildDropdowns();renderBuildsModal();
+}
+function renderBuildDropdowns(){
+  ['presetSelect','buildPresetSelect'].forEach(selId=>{
+    const sel=document.getElementById(selId);if(!sel)return;
+    sel.innerHTML='';
+    slots.forEach((s,i)=>{
+      const o=document.createElement('option');o.value='slot_'+i;o.textContent='📝 '+s.name;sel.appendChild(o);
+    });
+    const sep=document.createElement('option');sep.disabled=true;sep.textContent='──── 프리셋 ────';sel.appendChild(sep);
+    [['p0','🔥 극딜+준극 (0쿨뚝)'],['p2','🔥 극딜+준극 (2쿨뚝)'],['p5','🔥 극딜+준극 (5쿨뚝)'],['boost','🚀 부스트콜 (110초)']].forEach(([k,v])=>{
+      const o=document.createElement('option');o.value=k;o.textContent=v;sel.appendChild(o);
+    });
+    sel.value=activePreset==='custom'?'slot_'+activeSlot:activePreset;
+  });
+}
+function openBuilds(){renderBuildsModal();document.getElementById('buildsModal').classList.add('show');}
+function closeBuilds(){document.getElementById('buildsModal').classList.remove('show');}
+function renderBuildsModal(){
+  const body=document.getElementById('buildsBody');let h='';
+  slots.forEach((s,i)=>{
+    const on=activePreset==='custom'&&i===activeSlot;
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);'+(on?'background:rgba(92,184,255,.06);border-radius:8px;padding:10px 8px;margin:0 -8px;':'')+'">'
+      +'<span style="font-size:13px;color:'+(on?'var(--ac)':'var(--t)')+';flex:1;font-weight:'+(on?'700':'400')+';">'+(on?'▶ ':'')+s.name+'</span>'
+      +'<span style="font-size:10px;color:var(--tm);">'+s.phases.length+'구간</span>'
+      +(on?'<span class="b bsm" style="background:rgba(92,184,255,.15);color:var(--ac);border:1px solid rgba(92,184,255,.25);pointer-events:none;">사용중</span>':'<button class="b b1 bsm" onclick="switchSlot('+i+');renderBuildsModal();">선택</button>')
+      +'<button class="b b3 bsm" onclick="renameSlot('+i+')">✏️</button>'
+      +'<button class="b b3 bsm" onclick="duplicateSlot('+i+')">📋</button>'
+      +'<button class="b b4 bsm" onclick="removeSlot('+i+')">🗑️</button>'
+      +'</div>';
+  });
+  body.innerHTML=h||'<div style="text-align:center;padding:20px;color:var(--tm);">빌드가 없습니다</div>';
+}
+
+// ===== BUILD UI =====
+function updateEmpty(){
+  document.getElementById('emptyState').style.display=phases.length?'none':'block';
+}
+
+function renderBuild(){
+  document.getElementById('buildName').value=buildName;
+  const wrap=document.getElementById('buildScroll');
+  // Keep empty state
+  let html='<div class="empty" id="emptyState" style="display:'+(phases.length?'none':'block')+'"><h3>🎮 빌드 타이머</h3><p>수로, 극딜 등 어떤 빌드든 직접 만들 수 있어요.<br><b>"+ 구간 추가"</b>로 시작하세요!</p></div>';
+
+  phases.forEach((ph,pi)=>{
+    html+=`<div class="phase-block" data-pi="${pi}">
+      <div class="phase-head">
+        <span class="drag">⠿</span>
+        <input value="${esc(ph.name)}" placeholder="구간 이름" onchange="phases[${pi}].name=this.value;save();" spellcheck="false">
+        <select onchange="phases[${pi}].mode=this.value;save();" style="background:var(--bg);border:1px solid var(--brd);color:var(--ac);border-radius:5px;padding:3px 6px;font-size:11px;">
+          <option value="countdown" ${ph.mode==='countdown'?'selected':''}>⬇️ 카운트다운</option>
+          <option value="countup" ${ph.mode==='countup'?'selected':''}>⬆️ 카운트업</option>
+        </select>
+        <input type="number" value="${ph.duration}" min="0.1" max="600" step="0.1" style="width:55px;background:var(--bg);border:1px solid var(--brd);color:var(--y);border-radius:5px;padding:3px 6px;font-family:'JetBrains Mono',monospace;font-size:12px;text-align:center;" onchange="phases[${pi}].duration=+this.value;save();" title="구간 길이(초)">
+        <span style="font-size:10px;color:var(--tm);">초</span>
+        <button class="b b4 bsm" onclick="removePhase(${pi})">삭제</button>
+      </div>
+      <div class="phase-body">`;
+
+    ph.steps.forEach((st,si)=>{
+      const col=getColor(st.skills[0]?.color||'gray');
+      html+=`<div class="step">
+        <div class="step-time"><input type="number" value="${st.t}" min="0" max="999" step="0.1" onchange="phases[${pi}].steps[${si}].t=+this.value;save();"></div>
+        <div class="step-skills">`;
+      st.skills.forEach((sk,ki)=>{
+        const c=getColor(sk.color);
+        html+=`<span class="step-skill" style="background:${c.bg};color:${c.c};">
+          <div class="color-sel">
+            <div class="color-dot" style="background:${c.c};" onclick="toggleColorPop(this)"></div>
+            <div class="color-pop">${COLORS.map(cc=>`<div class="color-opt" style="background:${cc.c};" onclick="setSkillColor(${pi},${si},${ki},'${cc.id}')"></div>`).join('')}</div>
+          </div>
+          <input value="${esc(sk.name)}" onchange="phases[${pi}].steps[${si}].skills[${ki}].name=this.value;save();" spellcheck="false" style="width:${Math.max(30,sk.name.length*8)}px;">
+          <button class="sk-del" onclick="removeSkill(${pi},${si},${ki})">✕</button>
+        </span>`;
+      });
+      html+=`<button class="add-skill-btn" onclick="addSkill(${pi},${si})">+스킬</button></div>
+        <div class="step-note"><input placeholder="메모" value="${esc(st.note||'')}" onchange="phases[${pi}].steps[${si}].note=this.value;save();" spellcheck="false"></div>
+        <div class="step-btns"><button class="b b4 bsm" onclick="removeStep(${pi},${si})">✕</button></div>
+      </div>`;
+    });
+
+    html+=`<div class="add-step"><button class="b b5 bsm" onclick="addStep(${pi})">+ 스킬 타이밍 추가</button></div>
+      </div></div>`;
+  });
+  wrap.innerHTML=html;
+}
+
+function esc(s){return String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+
+function addPhase(){
+  phases.push({name:'',icon:'',mode:'countdown',duration:120,steps:[]});
+  save();renderBuild();
+}
+function removePhase(pi){
+  if(!confirm('이 구간을 삭제할까요?'))return;
+  phases.splice(pi,1);
+  if(activePreset==='custom'){
+    try{localStorage.setItem('build_data',JSON.stringify({name:buildName,phases}));}catch(e){}
+  }
+  renderBuild();buildTimerView();
+}
+function addStep(pi){
+  const lastT=phases[pi].steps.length?phases[pi].steps[phases[pi].steps.length-1].t:phases[pi].duration;
+  phases[pi].steps.push({t:Math.max(0,lastT-10),skills:[{name:'스킬명',color:'blue'}],note:''});
+  save();renderBuild();
+}
+function removeStep(pi,si){
+  phases[pi].steps.splice(si,1);save();renderBuild();
+}
+function addSkill(pi,si){
+  phases[pi].steps[si].skills.push({name:'스킬명',color:'gray'});
+  save();renderBuild();
+}
+function removeSkill(pi,si,ki){
+  if(phases[pi].steps[si].skills.length<=1)return;
+  phases[pi].steps[si].skills.splice(ki,1);save();renderBuild();
+}
+function setSkillColor(pi,si,ki,colorId){
+  phases[pi].steps[si].skills[ki].color=colorId;
+  save();renderBuild();
+  document.querySelectorAll('.color-pop').forEach(p=>p.classList.remove('show'));
+}
+function toggleColorPop(dot){
+  const pop=dot.nextElementSibling;
+  document.querySelectorAll('.color-pop').forEach(p=>{if(p!==pop)p.classList.remove('show');});
+  pop.classList.toggle('show');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.color-sel'))document.querySelectorAll('.color-pop').forEach(p=>p.classList.remove('show'));
+});
+
+document.getElementById('buildName').addEventListener('input',function(){buildName=this.value;save();});
+
+// IMPORT/EXPORT
+function exportBuild(){
+  const data=JSON.stringify({name:buildName,phases},null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`${buildName||'빌드'}.json`;
+  a.click();
+}
+function importBuild(){
+  const input=document.createElement('input');
+  input.type='file';input.accept='.json';
+  input.onchange=e=>{
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      try{
+        const d=JSON.parse(ev.target.result);
+        const name=d.name||'가져온 빌드';
+        const ph=d.phases||[];
+        slots.push({id:Date.now(),name,phases:ph});
+        saveSlots();
+        activeSlot=slots.length-1;activePreset='custom';
+        buildName=name;phases=JSON.parse(JSON.stringify(ph));
+        renderBuildDropdowns();renderBuild();buildTimerView();
+        alert('"'+name+'" 빌드를 추가했습니다!');
+      }catch(err){alert('파일 형식이 올바르지 않습니다.');}
+    };
+    r.readAsText(f);
+  };
+  input.click();
+}
+function clearAll(){
+  if(!confirm('현재 빌드의 구간을 전부 삭제할까요?'))return;
+  buildName=slots[activeSlot]?.name||'';phases=[];
+  save();renderBuild();buildTimerView();
+}
+
+// ===== TABS =====
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',i===(tab==='build'?0:1)));
+  document.getElementById('pageBuild').classList.toggle('on',tab==='build');
+  document.getElementById('pageTimer').classList.toggle('on',tab==='timer');
+  if(tab==='timer'){
+    document.getElementById('presetSelect').value=activePreset;
+    buildTimerView();
+  }
+}
+
+// ===== TIMER =====
+let iv=null,tMs=0,running=false,firedSet=new Set(),pipWin=null,startRef=0;
+let flatSteps=[]; // flattened for timer: [{elapsed,skills:[{name,color}],note,phaseName}]
+let totalDur=0;
+
+function buildTimerView(){
+  // Flatten phases into absolute elapsed timeline
+  flatSteps=[];
+  let elapsed=0;
+  phases.forEach(ph=>{
+    ph.steps.forEach(st=>{
+      let absE;
+      if(ph.mode==='countdown') absE=elapsed+(ph.duration-st.t);
+      else absE=elapsed+st.t;
+      flatSteps.push({elapsed:absE,skills:st.skills,note:st.note,phaseName:ph.name,phaseStart:elapsed,phaseDur:ph.duration});
+    });
+    elapsed+=ph.duration;
+  });
+  totalDur=elapsed;
+  flatSteps.sort((a,b)=>a.elapsed-b.elapsed);
+  renderTimerList();
+  updateTimer();
+}
+
+function renderTimerList(){
+  const w=document.getElementById('tlWrap');
+  if(!flatSteps.length){w.innerHTML='<div class="empty"><h3>빌드가 비어있어요</h3><p>편집 탭에서 구간과 스킬을 추가하세요.</p></div>';return;}
+  let html='',lastPh='';
+  flatSteps.forEach((st,i)=>{
+    if(st.phaseName!==lastPh){html+=`<div class="sdv">${st.phaseName||'구간'}</div>`;lastPh=st.phaseName;}
+    const sk=st.skills.map(s=>{const c=getColor(s.color);return `<span class="sk" style="background:${c.bg};color:${c.c};">${s.name}</span>`;}).join('<span class="aw">→</span>');
+    const nt=st.note?`<div class="tn">${st.note}</div>`:'';
+    // Show phase-relative time
+    const relT=st.elapsed-st.phaseStart;
+    const pDur=st.phaseDur;
+    const remaining=pDur-relT;
+    const timeStr=remaining<10?remaining.toFixed(1)+'s':Math.round(remaining)+'s';
+    html+=`<div class="tl upcoming" id="ts-${i}"><div class="tt">${timeStr}</div><div class="ts">${sk}</div></div>${nt}`;
+  });
+  w.innerHTML=html;
+}
+
+function renderPipList(doc){
+  const b=doc.getElementById('pipBd');if(!b)return;
+  let html='',lastPh='';
+  flatSteps.forEach((st,i)=>{
+    if(st.phaseName!==lastPh){html+=`<div class="psd">${st.phaseName||'구간'}</div>`;lastPh=st.phaseName;}
+    const sk=st.skills.map(s=>{const c=getColor(s.color);return `<span class="ps" style="background:${c.bg};color:${c.c};font-size:10px;">${s.name}</span>`;}).join('');
+    const nt=st.note?`<div class="pn">${st.note}</div>`:'';
+    const relT=st.elapsed-st.phaseStart;const remaining=st.phaseDur-relT;
+    const timeStr=remaining<10?remaining.toFixed(1)+'s':Math.round(remaining)+'s';
+    html+=`<div class="pr upcoming" id="p-ts-${i}"><div class="pt2">${timeStr}</div><div class="psk">${sk}</div></div>${nt}`;
+  });
+  b.innerHTML=html;
+}
+
+function updateTimer(){
+  const e=tMs/1000;
+  updateTimerDoc(document,e,false);
+  if(pipWin&&!pipWin.closed)updateTimerDoc(pipWin.document,e,true);
+  fireAudio(e);
+}
+
+function updateTimerDoc(doc,e,pip){
+  const tEl=doc.getElementById(pip?'pipTm':'timerD');
+  const pEl=doc.getElementById(pip?'pipPh':'phLabel');
+  const gEl=doc.getElementById(pip?'pipPg':'pgBar');
+  if(!tEl)return;
+
+  // Find current phase
+  let cum=0,curPh=null;
+  for(const ph of phases){
+    if(e<cum+ph.duration){curPh={name:ph.name,mode:ph.mode,dur:ph.duration,start:cum,localE:e-cum};break;}
+    cum+=ph.duration;
+  }
+
+  tEl.className=pip?'pt':'td';
+  if(!curPh||e>=totalDur){
+    tEl.textContent='0';tEl.classList.add('end');
+    pEl.textContent='종료';pEl.className=pip?'pp':'ph';
+  } else {
+    const raw=curPh.mode==='countdown'?curPh.dur-curPh.localE:curPh.localE;
+    const disp=raw<10?Math.max(0,raw).toFixed(1):Math.ceil(Math.max(0,raw));
+    tEl.textContent=disp;
+    pEl.textContent=curPh.name||'진행중';
+    pEl.className=(pip?'pp':'ph')+' on';
+  }
+  if(gEl)gEl.style.width=Math.min(100,(e/Math.max(1,totalDur))*100)+'%';
+
+  // Highlight
+  let ae=null;const px=pip?'p-':'';
+  flatSteps.forEach((st,i)=>{
+    const el=doc.getElementById(`${px}ts-${i}`);if(!el)return;
+    el.className=pip?'pr':'tl';
+    if(e<st.elapsed-0.5)el.classList.add('upcoming');
+    else if(e<st.elapsed+4){el.classList.add('active');ae=el;}
+    else el.classList.add('done');
+  });
+  if(ae&&running)ae.scrollIntoView({behavior:'smooth',block:'center'});
+
+  // Next
+  const bar=doc.getElementById(pip?'pipNx':'nextBar');
+  const nsk=doc.getElementById(pip?'pipNxSk':'nextSk');
+  const ntm=doc.getElementById(pip?'pipNxTm':'nextTm');
+  if(!bar)return;
+  if(!running){bar.classList.remove('on');return;}
+  let ns=null,su=0;
+  for(const st of flatSteps){if(e<st.elapsed-0.5){ns=st;su=st.elapsed-e;break;}}
+  if(ns){
+    bar.classList.add('on');
+    nsk.innerHTML=ns.skills.map(s=>{const c=getColor(s.color);return `<span class="${pip?'ps':'sk'}" style="background:${c.bg};color:${c.c};font-size:${pip?9:11}px;">${s.name}</span>`;}).join('');
+    ntm.textContent=su<10?su.toFixed(1)+'초 후':Math.ceil(su)+'초 후';
+  } else if(document.getElementById('chkLoop').checked&&flatSteps.length){
+    // Loop mode: show first step of next cycle
+    const first=flatSteps[0];
+    const remain=totalDur-e+first.elapsed;
+    bar.classList.add('on');
+    nsk.innerHTML='<span style="color:var(--y);font-size:'+(pip?9:11)+'px;font-weight:700;">🔄 </span>'+first.skills.map(s=>{const c=getColor(s.color);return `<span class="${pip?'ps':'sk'}" style="background:${c.bg};color:${c.c};font-size:${pip?9:11}px;">${s.name}</span>`;}).join('');
+    ntm.textContent=remain<10?remain.toFixed(1)+'초 후':Math.ceil(remain)+'초 후';
+  } else bar.classList.remove('on');
+}
+
+// ===== AUDIO =====
+const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+function beep(freq=880,dur=0.08){
+  if(!document.getElementById('chkBeep').checked)return;
+  const vol=document.getElementById('volBeep').value/100;
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.connect(g);g.connect(audioCtx.destination);
+  o.frequency.value=freq;o.type='sine';
+  g.gain.setValueAtTime(vol*0.3,audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dur);
+  o.start();o.stop(audioCtx.currentTime+dur);
+}
+function speak(text){
+  if(!document.getElementById('chkTts').checked)return;
+  if(!('speechSynthesis' in window))return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='ko-KR';u.rate=document.getElementById('ttsRate').value/100;u.pitch=1.0;
+  u.volume=document.getElementById('volTts').value/100;
+  const sel=document.getElementById('voiceSelect');
+  const voices=speechSynthesis.getVoices();
+  if(sel.value){const ch=voices.find(v=>v.voiceURI===sel.value);if(ch)u.voice=ch;}
+  speechSynthesis.speak(u);
+}
+function testVoice(){audioCtx.resume();speak('프리드 3스택, 준비');}
+function loadVoices(){
+  const sel=document.getElementById('voiceSelect');
+  const voices=speechSynthesis.getVoices();
+  const saved=localStorage.getItem('build_voice')||'';
+  sel.innerHTML='';
+  const ko=voices.filter(v=>v.lang.startsWith('ko'));
+  const others=voices.filter(v=>!v.lang.startsWith('ko'));
+  if(ko.length){const og=document.createElement('optgroup');og.label='🇰🇷 한국어';ko.forEach(v=>{const o=document.createElement('option');o.value=v.voiceURI;o.textContent=v.name;if(v.voiceURI===saved)o.selected=true;og.appendChild(o);});sel.appendChild(og);}
+  if(others.length){const og=document.createElement('optgroup');og.label='기타';others.forEach(v=>{const o=document.createElement('option');o.value=v.voiceURI;o.textContent=`${v.name} (${v.lang})`;if(v.voiceURI===saved)o.selected=true;og.appendChild(o);});sel.appendChild(og);}
+  if(!saved&&ko.length)sel.value=ko[0].voiceURI;
+}
+document.getElementById('voiceSelect').addEventListener('change',function(){try{localStorage.setItem('build_voice',this.value);}catch(e){}});
+
+function fireAudio(e){
+  if(!running)return;
+  flatSteps.forEach((st,i)=>{
+    const key=`s-${i}`;
+    if(!firedSet.has(key)&&e>=st.elapsed-0.15&&e<st.elapsed+1){
+      firedSet.add(key);beep(880,0.1);
+      speak(st.skills.map(s=>s.name).join(', '));
+    }
+    const pk=`p-${i}`;
+    if(document.getElementById('chkPreTts').checked&&!firedSet.has(pk)&&e>=st.elapsed-2.15&&e<st.elapsed-1){
+      firedSet.add(pk);beep(440,0.05);speak('준비, '+st.skills.map(s=>s.name).join(', '));
+    }
+  });
+}
+
+// ===== CONTROLS =====
+function toggle(){
+  audioCtx.resume();
+  if(!flatSteps.length){buildTimerView();}
+  if(running){
+    clearInterval(iv);running=false;
+    document.getElementById('btnS').textContent='재개';document.getElementById('btnS').className='b b1';
+  } else {
+    running=true;
+    document.getElementById('btnS').textContent='일시정지';document.getElementById('btnS').className='b b2';
+    // Auto-start origin if enabled and not running
+    if(originEnabled&&!originRunning){toggleOrigin();}
+    startRef=performance.now()-tMs;
+    iv=setInterval(()=>{
+      tMs=performance.now()-startRef;
+      if(tMs>=totalDur*1000){
+        if(document.getElementById('chkLoop').checked){
+          clearInterval(iv);running=false;tMs=0;firedSet.clear();speechSynthesis?.cancel();
+          document.getElementById('btnS').textContent='시작';document.getElementById('btnS').className='b b1';document.getElementById('btnS').disabled=false;
+          buildTimerView();
+          setTimeout(()=>toggle(),50);
+          return;
+        }
+        tMs=totalDur*1000;clearInterval(iv);running=false;document.getElementById('btnS').textContent='완료';document.getElementById('btnS').disabled=true;
+      }
+      updateTimer();
+    },100);
+  }
+}
+
+// Delayed start
+function delayedStart(){
+  const sec=parseInt(document.getElementById('startDelaySec').value)||5;
+  let remain=sec;
+  document.getElementById('btnS').disabled=true;
+  document.getElementById('btnS').textContent=remain+'초 후 시작';
+  document.getElementById('btnS').className='b b2';
+  const ci=setInterval(()=>{
+    remain--;
+    if(remain<=0){
+      clearInterval(ci);
+      document.getElementById('btnS').disabled=false;
+      toggle();
+    } else {
+      document.getElementById('btnS').textContent=remain+'초 후 시작';
+      if(remain<=3)beep(440,0.05);
+    }
+  },1000);
+  beep(440,0.05);
+}
+function resetTimer(){
+  clearInterval(iv);running=false;tMs=0;firedSet.clear();
+  speechSynthesis?.cancel();
+  document.getElementById('btnS').textContent='시작';document.getElementById('btnS').className='b b1';document.getElementById('btnS').disabled=false;
+  buildTimerView();
+}
+
+function adjTime(sec){
+  tMs=Math.max(0,Math.min(totalDur*1000,tMs+sec*1000));
+  if(running) startRef=performance.now()-tMs;
+  // Re-check fired steps
+  firedSet.clear();
+  const e=tMs/1000;
+  flatSteps.forEach((st,i)=>{
+    if(e>=st.elapsed+1)firedSet.add(`s-${i}`);
+    if(e>=st.elapsed-1)firedSet.add(`p-${i}`);
+  });
+  updateTimer();
+}
+
+// ===== KEYBINDS =====
+let binds={toggle:'Space',reset:'KeyR',pip:'KeyP',quickRestart:'none'};
+try{const s=localStorage.getItem('build_binds');if(s)binds=JSON.parse(s);}catch(e){}
+let recKey=null;
+
+function quickRestart(){
+  clearInterval(iv);running=false;tMs=0;firedSet.clear();
+  speechSynthesis?.cancel();
+  document.getElementById('btnS').textContent='시작';document.getElementById('btnS').className='b b1';document.getElementById('btnS').disabled=false;
+  buildTimerView();
+  // auto start
+  setTimeout(()=>toggle(),50);
+}
+
+document.addEventListener('keydown',e=>{
+  if(recKey){
+    e.preventDefault();
+    if(e.code==='Escape'){binds[recKey]='none';}
+    else if(e.code==='Delete'||e.code==='Backspace'){binds[recKey]='none';}
+    else{binds[recKey]=e.code;}
+    try{localStorage.setItem('build_binds',JSON.stringify(binds));}catch(x){}
+    recKey=null;renderKeysModal();return;
+  }
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
+  if(binds.toggle!=='none'&&e.code===binds.toggle){e.preventDefault();toggle();}
+  if(binds.reset!=='none'&&e.code===binds.reset){e.preventDefault();resetTimer();}
+  if(binds.pip!=='none'&&e.code===binds.pip){e.preventDefault();openPip();}
+  if(binds.quickRestart!=='none'&&e.code===binds.quickRestart){e.preventDefault();quickRestart();}
+});
+function openKeys(){renderKeysModal();document.getElementById('keysModal').classList.add('show');}
+function closeKeys(){recKey=null;document.getElementById('keysModal').classList.remove('show');}
+function renderKeysModal(){
+  const labels={toggle:'시작/정지',reset:'리셋',quickRestart:'리셋+자동시작 (극딜용)',pip:'PIP'};
+  let h='<div style="font-size:11px;color:#475569;padding:0 0 10px;">Esc 또는 Delete = 미설정으로 변경</div>';
+  for(const[k,l] of Object.entries(labels)){
+    const d=formatKey(binds[k]),isR=recKey===k;
+    h+=`<div class="kb-row"><div class="kb-label">${l}</div><button class="kb-btn ${isR?'rec':''}" onclick="recKey='${k}';renderKeysModal();">${isR?'키 입력...':d}</button></div>`;
+  }
+  document.getElementById('keysBody').innerHTML=h;
+}
+function formatKey(c){if(c==='none')return '미설정';const m={'Space':'스페이스','KeyR':'R','KeyP':'P','Enter':'Enter','Escape':'Esc'};if(m[c])return m[c];if(c.startsWith('Key'))return c.slice(3);if(c.startsWith('Digit'))return c.slice(5);return c;}
+
+// ===== PIP =====
+async function openPip(){
+  if('documentPictureInPicture' in window){
+    try{
+      pipWin=await documentPictureInPicture.requestWindow({width:300,height:460});
+      const fl=pipWin.document.createElement('link');fl.href='https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Outfit:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap';fl.rel='stylesheet';pipWin.document.head.appendChild(fl);
+      pipWin.document.body.appendChild(document.getElementById('pipTpl').content.cloneNode(true));
+      pipWin.adjTime=adjTime;
+      renderPipList(pipWin.document);updateTimer();
+      pipWin.addEventListener('pagehide',()=>{pipWin=null;});return;
+    }catch(e){}
+  }
+  const w=300,h=460;
+  pipWin=window.open('','build_pip',`width=${w},height=${h},left=${screen.width-w-20},top=60,toolbar=no,menubar=no`);
+  if(!pipWin){alert('팝업 허용 필요');return;}
+  pipWin.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Outfit:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">');
+  const tpl=document.getElementById('pipTpl'),d=document.createElement('div');d.appendChild(tpl.content.cloneNode(true));
+  const sty=d.querySelector('style').outerHTML;d.querySelector('style').remove();
+  pipWin.document.write(sty+'</head><body>'+d.innerHTML+'</body></html>');pipWin.document.close();
+  setTimeout(()=>{renderPipList(pipWin.document);updateTimer();},300);
+  setInterval(()=>{if(!pipWin||pipWin.closed)pipWin=null;},1000);
+}
+
+// ===== DELAY =====
+function applyDelay(){
+  const d=parseFloat(document.getElementById('delayVal').value)||0;
+  try{localStorage.setItem('build_delay',d);}catch(e){}
+  // Recalculate preset durations with delay
+  if(activePreset!=='custom'){
+    const p=PRESET_DATA[activePreset];
+    if(p){
+      phases=JSON.parse(JSON.stringify(p.phases));
+      phases.forEach(ph=>{ph.duration=ph.duration+d;});
+      buildTimerView();
+    }
+  }
+}
+try{const sd=localStorage.getItem('build_delay');if(sd)document.getElementById('delayVal').value=sd;}catch(e){}
+
+// ===== ORIGIN TRACKER =====
+let originCd=338.4;
+let originMs=0,originRunning=false,originIv=null,originStartRef=0;
+let originEnabled=false;
+
+const MERC_PCT={0:0,120:0.03,180:0.04,200:0.05,250:0.06};
+
+function calcOriginCd(){
+  const mercLv=parseInt(document.getElementById('mercLv').value)||0;
+  const hat=parseFloat(document.getElementById('originHat').value)||0;
+  const pct=MERC_PCT[mercLv]||0;
+  const base=360;
+  let cd=base*(1-pct)-hat;
+  if(cd<10)cd=10*(1-0.05*(hat-(base*(1-pct)-10)));
+  cd=Math.max(10,Math.round(cd*10)/10);
+  originCd=cd;
+  document.getElementById('originCfgResult').textContent='= '+cd+'초';
+  updateOriginDisplay();
+  // Save settings
+  try{localStorage.setItem('origin_cfg',JSON.stringify({mercLv,hat,enabled:originEnabled}));}catch(e){}
+}
+
+function getOriginCd(){
+  return originCd;
+}
+
+function toggleOriginCfg(){
+  originEnabled=document.getElementById('chkOrigin').checked;
+  document.getElementById('originCfgFields').style.display=originEnabled?'flex':'none';
+  document.getElementById('originBar').style.display=originEnabled?'block':'none';
+  if(originEnabled){calcOriginCd();}
+  else{if(originRunning){clearInterval(originIv);originRunning=false;}}
+  try{localStorage.setItem('origin_cfg',JSON.stringify({
+    mercLv:parseInt(document.getElementById('mercLv').value)||0,
+    hat:parseFloat(document.getElementById('originHat').value)||0,
+    enabled:originEnabled
+  }));}catch(e){}
+}
+
+function loadOriginCfg(){
+  try{
+    const d=JSON.parse(localStorage.getItem('origin_cfg'));
+    if(d){
+      originEnabled=!!d.enabled;
+      document.getElementById('chkOrigin').checked=originEnabled;
+      document.getElementById('originCfgFields').style.display=originEnabled?'flex':'none';
+      if(d.mercLv!==undefined)document.getElementById('mercLv').value=d.mercLv;
+      if(d.hat!==undefined)document.getElementById('originHat').value=d.hat;
+      if(originEnabled)calcOriginCd();
+    }
+  }catch(e){}
+}
+
+function showOriginBar(){
+  const bar=document.getElementById('originBar');
+  if(bar)bar.style.display=originEnabled?'block':'none';
+  if(originEnabled)calcOriginCd();
+}
+
+function toggleOrigin(){
+  if(originRunning){
+    clearInterval(originIv);originRunning=false;
+    document.getElementById('originBtn').textContent='재개';
+    document.getElementById('originBtn').classList.remove('running');
+  } else {
+    originRunning=true;
+    document.getElementById('originBtn').textContent='정지';
+    document.getElementById('originBtn').classList.add('running');
+    originStartRef=performance.now()-originMs;
+    originIv=setInterval(()=>{
+      originMs=performance.now()-originStartRef;
+      const total=originCd*1000;
+      if(originMs>=total){
+        originMs=0;originStartRef=performance.now();
+        beep(660,0.15);speak('오리진 쿨 완료');
+      }
+      updateOriginDisplay();
+    },200);
+  }
+}
+
+function resetOrigin(){
+  clearInterval(originIv);originRunning=false;originMs=0;
+  document.getElementById('originBtn').textContent='시작';
+  document.getElementById('originBtn').classList.remove('running');
+  originCd=getOriginCd();
+  updateOriginDisplay();
+}
+
+function updateOriginDisplay(){
+  const remain=Math.max(0,originCd-originMs/1000);
+  const el=document.getElementById('originCd');
+  const pg=document.getElementById('originPgB');
+  if(!el)return;
+  const m=Math.floor(remain/60);
+  const s=Math.floor(remain%60);
+  const totalSec=Math.ceil(remain);
+  if(remain>=60){
+    el.textContent=`${m}:${String(s).padStart(2,'0')} (${totalSec}s)`;
+  } else {
+    el.textContent=remain<10?remain.toFixed(1)+'s':totalSec+'s';
+  }
+  if(pg)pg.style.width=((originMs/1000)/originCd*100)+'%';
+}
+
+// Show origin bar on init
+// Show origin bar on init - moved to INIT section below
+
+// ===== PRESETS =====
+const PRESET_DATA = {
+  p0: {name:'극딜 (0쿨뚝/메르250)',phases:[{name:'🔥 극딜 사이클 (0쿨뚝)',icon:'',mode:'countup',duration:112.8,steps:[
+    {t:0,skills:[{name:'극딜 시작',color:'red'}],note:'극딜'},
+    {t:56.4,skills:[{name:'준극 시작',color:'orange'}],note:'준극'}
+  ]}]},
+  p2: {name:'극딜 (2쿨뚝/메르250)',phases:[{name:'🔥 극딜 사이클 (2쿨뚝)',icon:'',mode:'countup',duration:110.8,steps:[
+    {t:0,skills:[{name:'극딜 시작',color:'red'}],note:'극딜'},
+    {t:54.4,skills:[{name:'준극 시작',color:'orange'}],note:'준극'}
+  ]}]},
+  p5: {name:'극딜 (5쿨뚝/메르250)',phases:[{name:'🔥 극딜 사이클 (5쿨뚝)',icon:'',mode:'countup',duration:107.8,steps:[
+    {t:0,skills:[{name:'극딜 시작',color:'red'}],note:'극딜'},
+    {t:51.4,skills:[{name:'준극 시작',color:'orange'}],note:'준극'}
+  ]}]},
+  boost: {name:'부스트 콜 (110초)',phases:[{name:'🚀 부스트 콜',icon:'',mode:'countup',duration:110,steps:[
+    {t:0,skills:[{name:'부스트 콜',color:'orange'}],note:''}
+  ]}]}
+};
+
+let activePreset='custom';
+
+function selectPreset(val){
+  if(running){clearInterval(iv);running=false;}
+  tMs=0;firedSet.clear();speechSynthesis?.cancel();
+  document.getElementById('btnS').textContent='시작';document.getElementById('btnS').className='b b1';document.getElementById('btnS').disabled=false;
+
+  if(val.startsWith('slot_')){
+    const idx=parseInt(val.replace('slot_',''));
+    switchSlot(idx);
+    originCd=getOriginCd();updateOriginDisplay();
+    return;
+  }
+  // Save current slot before switching to preset
+  if(activePreset==='custom'&&slots[activeSlot]){
+    slots[activeSlot].name=buildName;
+    slots[activeSlot].phases=JSON.parse(JSON.stringify(phases));
+    saveSlots();
+  }
+  activePreset=val;
+  const p=PRESET_DATA[val];
+  if(!p){activePreset='custom';load();renderBuild();buildTimerView();return;}
+  buildName=p.name;
+  phases=JSON.parse(JSON.stringify(p.phases));
+  const delay=parseFloat(document.getElementById('delayVal').value)||0;
+  if(delay>0){phases.forEach(ph=>{ph.duration=ph.duration+delay;});}
+  originCd=getOriginCd();updateOriginDisplay();
+  renderBuildDropdowns();renderBuild();buildTimerView();
+}
+
+// ===== VOICES INIT =====
+if('speechSynthesis' in window){speechSynthesis.onvoiceschanged=()=>loadVoices();setTimeout(()=>{if(!document.getElementById('voiceSelect').options.length)loadVoices();},500);}
+
+// ===== INIT =====
+load();renderBuildDropdowns();renderBuild();loadOriginCfg();showOriginBar();updateOriginDisplay();
+</script>
+</body>
+</html>
