@@ -125,6 +125,13 @@ body{background:var(--bg);color:var(--t);font-family:'Noto Sans KR',sans-serif;h
 .origin-btn.origin-reset{color:var(--td);border-color:var(--brd);background:rgba(255,255,255,.04);}
 .origin-btn.running{background:rgba(255,212,59,.12);color:var(--y);border-color:rgba(255,212,59,.3);}
 
+.origin-cfg{flex-shrink:0;padding:8px 14px;border-bottom:1px solid var(--brd);background:rgba(255,146,43,.03);display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:11px;}
+.origin-cfg-chk{display:flex;align-items:center;gap:5px;color:var(--o);font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;}
+.origin-cfg-chk input{accent-color:var(--o);width:14px;height:14px;}
+.origin-cfg-fields{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.origin-cfg-fields label{display:flex;align-items:center;gap:4px;color:var(--td);white-space:nowrap;}
+.origin-cfg-result{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--o);}
+
 .tl-w{flex:1;overflow-y:auto;padding:8px 12px 100px;scroll-behavior:smooth;}
 .tl-w::-webkit-scrollbar{width:3px;}
 .tl-w::-webkit-scrollbar-thumb{background:var(--brd);border-radius:2px;}
@@ -188,16 +195,26 @@ body{background:var(--bg);color:var(--t);font-family:'Noto Sans KR',sans-serif;h
 <!-- ===== BUILD PAGE ===== -->
 <div class="page on" id="pageBuild">
   <div class="build-top">
-    <select id="buildPresetSelect" onchange="selectPreset(this.value);renderBuild();" style="background:var(--bg2);border:1px solid var(--brd);color:var(--y);border-radius:6px;padding:5px 8px;font-family:'Noto Sans KR',sans-serif;font-size:11px;font-weight:700;">
-      <option value="custom">📝 내 빌드</option>
-      <option value="p0">🔥 극딜+준극 (0쿨뚝/메르250)</option>
-      <option value="p2">🔥 극딜+준극 (2쿨뚝/메르250)</option>
-      <option value="p5">🔥 극딜+준극 (5쿨뚝/메르250)</option>
-      <option value="boost">🚀 부스트콜 (110초)</option>
+    <select id="buildPresetSelect" onchange="selectPreset(this.value);" style="background:var(--bg2);border:1px solid var(--brd);color:var(--y);border-radius:6px;padding:5px 8px;font-family:'Noto Sans KR',sans-serif;font-size:11px;font-weight:700;">
     </select>
+    <button class="b b3 bsm" onclick="openBuilds()" title="빌드 관리">📂</button>
     <input id="buildName" placeholder="빌드 이름 (예: 에반 수로, 아크 극딜...)" spellcheck="false">
     <button class="b b5" onclick="addPhase()">+ 구간 추가</button>
     <button class="b b3" onclick="openKeys()">⌨️ 단축키</button>
+  </div>
+  <div class="origin-cfg" id="originCfg">
+    <label class="origin-cfg-chk"><input type="checkbox" id="chkOrigin" onchange="toggleOriginCfg()"> 🌟 오리진 타이머</label>
+    <div class="origin-cfg-fields" id="originCfgFields" style="display:none;">
+      <label>메르 Lv <select id="mercLv" onchange="calcOriginCd()" style="background:var(--bg);border:1px solid var(--brd);color:var(--ac);border-radius:5px;padding:3px 6px;font-size:11px;">
+        <option value="0">0 (0%)</option>
+        <option value="120">120 (3%)</option>
+        <option value="180">180 (4%)</option>
+        <option value="200">200 (5%)</option>
+        <option value="250" selected>250 (6%)</option>
+      </select></label>
+      <label>쿨뚝 <input type="number" id="originHat" min="0" max="10" step="1" value="0" onchange="calcOriginCd()" style="width:40px;background:var(--bg);border:1px solid var(--brd);color:var(--y);border-radius:4px;padding:3px 5px;font-family:'JetBrains Mono',monospace;font-size:11px;text-align:center;">초</label>
+      <span class="origin-cfg-result" id="originCfgResult">= 338.4초</span>
+    </div>
   </div>
   <div class="build-scroll" id="buildScroll">
     <div class="empty" id="emptyState">
@@ -224,12 +241,7 @@ body{background:var(--bg);color:var(--t);font-family:'Noto Sans KR',sans-serif;h
       <div class="td" id="timerD">--</div>
     </div>
     <div class="ctrls">
-      <select id="presetSelect" onchange="selectPreset(this.value)" style="background:var(--bg);border:1px solid var(--brd);color:var(--y);border-radius:6px;padding:5px 8px;font-family:'Noto Sans KR',sans-serif;font-size:11px;font-weight:700;max-width:160px;">
-        <option value="custom">📝 내 빌드</option>
-        <option value="p0">🔥 극딜+준극 (0쿨뚝)</option>
-        <option value="p2">🔥 극딜+준극 (2쿨뚝)</option>
-        <option value="p5">🔥 극딜+준극 (5쿨뚝)</option>
-        <option value="boost">🚀 부스트콜 (110초)</option>
+      <select id="presetSelect" onchange="selectPreset(this.value)" style="background:var(--bg);border:1px solid var(--brd);color:var(--y);border-radius:6px;padding:5px 8px;font-family:'Noto Sans KR',sans-serif;font-size:11px;font-weight:700;max-width:180px;">
       </select>
       <button class="b b1" id="btnS" onclick="toggle()">시작</button>
       <button class="b b3" onclick="resetTimer()">리셋</button>
@@ -283,6 +295,18 @@ body{background:var(--bg);color:var(--t);font-family:'Noto Sans KR',sans-serif;h
     <div class="modal-head"><h2>⌨️ 단축키 설정</h2><button class="modal-close" onclick="closeKeys()">✕</button></div>
     <div class="modal-body" id="keysBody"></div>
     <div class="modal-foot"><button class="b b1" onclick="closeKeys()">확인</button></div>
+  </div>
+</div>
+
+<!-- BUILDS MODAL -->
+<div class="modal-bg" id="buildsModal">
+  <div class="modal">
+    <div class="modal-head"><h2>📂 내 빌드 목록</h2><button class="modal-close" onclick="closeBuilds()">✕</button></div>
+    <div class="modal-body" id="buildsBody"></div>
+    <div class="modal-foot">
+      <button class="b b5" onclick="addSlot()">+ 새 빌드</button>
+      <button class="b b3" onclick="closeBuilds()">닫기</button>
+    </div>
   </div>
 </div>
 
@@ -359,18 +383,112 @@ function getColor(id){return COLORS.find(c=>c.id===id)||COLORS[10];}
 // phases: [{name, icon, mode:'countdown'|'countup', duration, steps:[{t, skills:[{name,color}], note}]}]
 let buildName='';
 let phases=[];
+let slots=[];
+let activeSlot=0;
+
+function loadSlots(){
+  try{
+    const d=JSON.parse(localStorage.getItem('build_slots'));
+    if(d&&d.length){slots=d;return;}
+  }catch(e){}
+  try{
+    const old=JSON.parse(localStorage.getItem('build_data'));
+    if(old&&old.phases&&old.phases.length){
+      slots=[{id:Date.now(),name:old.name||'빌드 1',phases:old.phases}];
+      saveSlots();return;
+    }
+  }catch(e){}
+  slots=[{id:Date.now(),name:'빌드 1',phases:[]}];
+  saveSlots();
+}
+function saveSlots(){try{localStorage.setItem('build_slots',JSON.stringify(slots));}catch(e){}}
 
 function save(){
-  if(activePreset==='custom'){
-    try{localStorage.setItem('build_data',JSON.stringify({name:buildName,phases}));}catch(e){}
+  if(activePreset!=='custom')return;
+  if(slots[activeSlot]){
+    slots[activeSlot].name=buildName;
+    slots[activeSlot].phases=JSON.parse(JSON.stringify(phases));
+    saveSlots();
   }
   updateEmpty();
 }
 function load(){
-  try{
-    const d=JSON.parse(localStorage.getItem('build_data'));
-    if(d){buildName=d.name||'';phases=d.phases||[];}
-  }catch(e){}
+  loadSlots();
+  if(activeSlot>=slots.length)activeSlot=0;
+  const s=slots[activeSlot];
+  if(s){buildName=s.name||'';phases=JSON.parse(JSON.stringify(s.phases||[]));}
+  else{buildName='';phases=[];}
+}
+function switchSlot(idx){
+  if(activePreset==='custom'&&slots[activeSlot]){
+    slots[activeSlot].name=buildName;
+    slots[activeSlot].phases=JSON.parse(JSON.stringify(phases));
+    saveSlots();
+  }
+  activeSlot=idx;activePreset='custom';
+  const s=slots[idx];
+  if(s){buildName=s.name||'';phases=JSON.parse(JSON.stringify(s.phases||[]));}
+  renderBuild();buildTimerView();renderBuildDropdowns();
+}
+function addSlot(){
+  const name=prompt('새 빌드 이름:','빌드 '+(slots.length+1));
+  if(!name)return;
+  slots.push({id:Date.now(),name,phases:[]});saveSlots();
+  activeSlot=slots.length-1;activePreset='custom';
+  buildName=name;phases=[];
+  renderBuild();buildTimerView();renderBuildDropdowns();renderBuildsModal();
+}
+function removeSlot(idx){
+  if(slots.length<=1){alert('최소 1개의 빌드는 필요합니다.');return;}
+  if(!confirm('"'+slots[idx].name+'" 삭제할까요?'))return;
+  slots.splice(idx,1);
+  if(activeSlot>=slots.length)activeSlot=slots.length-1;
+  saveSlots();
+  const s=slots[activeSlot];
+  if(s){buildName=s.name||'';phases=JSON.parse(JSON.stringify(s.phases||[]));}
+  renderBuild();buildTimerView();renderBuildDropdowns();renderBuildsModal();
+}
+function renameSlot(idx){
+  const name=prompt('빌드 이름 변경:',slots[idx].name);
+  if(!name)return;
+  slots[idx].name=name;if(idx===activeSlot)buildName=name;
+  saveSlots();renderBuild();renderBuildDropdowns();renderBuildsModal();
+}
+function duplicateSlot(idx){
+  const src=slots[idx];
+  slots.push({id:Date.now(),name:src.name+' (복사)',phases:JSON.parse(JSON.stringify(src.phases))});
+  saveSlots();renderBuildDropdowns();renderBuildsModal();
+}
+function renderBuildDropdowns(){
+  ['presetSelect','buildPresetSelect'].forEach(selId=>{
+    const sel=document.getElementById(selId);if(!sel)return;
+    sel.innerHTML='';
+    slots.forEach((s,i)=>{
+      const o=document.createElement('option');o.value='slot_'+i;o.textContent='📝 '+s.name;sel.appendChild(o);
+    });
+    const sep=document.createElement('option');sep.disabled=true;sep.textContent='──── 프리셋 ────';sel.appendChild(sep);
+    [['p0','🔥 극딜+준극 (0쿨뚝)'],['p2','🔥 극딜+준극 (2쿨뚝)'],['p5','🔥 극딜+준극 (5쿨뚝)'],['boost','🚀 부스트콜 (110초)']].forEach(([k,v])=>{
+      const o=document.createElement('option');o.value=k;o.textContent=v;sel.appendChild(o);
+    });
+    sel.value=activePreset==='custom'?'slot_'+activeSlot:activePreset;
+  });
+}
+function openBuilds(){renderBuildsModal();document.getElementById('buildsModal').classList.add('show');}
+function closeBuilds(){document.getElementById('buildsModal').classList.remove('show');}
+function renderBuildsModal(){
+  const body=document.getElementById('buildsBody');let h='';
+  slots.forEach((s,i)=>{
+    const on=activePreset==='custom'&&i===activeSlot;
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);'+(on?'background:rgba(92,184,255,.06);border-radius:8px;padding:10px 8px;margin:0 -8px;':'')+'">'
+      +'<span style="font-size:13px;color:'+(on?'var(--ac)':'var(--t)')+';flex:1;font-weight:'+(on?'700':'400')+';">'+(on?'▶ ':'')+s.name+'</span>'
+      +'<span style="font-size:10px;color:var(--tm);">'+s.phases.length+'구간</span>'
+      +(on?'<span class="b bsm" style="background:rgba(92,184,255,.15);color:var(--ac);border:1px solid rgba(92,184,255,.25);pointer-events:none;">사용중</span>':'<button class="b b1 bsm" onclick="switchSlot('+i+');renderBuildsModal();">선택</button>')
+      +'<button class="b b3 bsm" onclick="renameSlot('+i+')">✏️</button>'
+      +'<button class="b b3 bsm" onclick="duplicateSlot('+i+')">📋</button>'
+      +'<button class="b b4 bsm" onclick="removeSlot('+i+')">🗑️</button>'
+      +'</div>';
+  });
+  body.innerHTML=h||'<div style="text-align:center;padding:20px;color:var(--tm);">빌드가 없습니다</div>';
 }
 
 // ===== BUILD UI =====
@@ -435,7 +553,11 @@ function addPhase(){
 }
 function removePhase(pi){
   if(!confirm('이 구간을 삭제할까요?'))return;
-  phases.splice(pi,1);save();renderBuild();
+  phases.splice(pi,1);
+  if(activePreset==='custom'){
+    try{localStorage.setItem('build_data',JSON.stringify({name:buildName,phases}));}catch(e){}
+  }
+  renderBuild();buildTimerView();
 }
 function addStep(pi){
   const lastT=phases[pi].steps.length?phases[pi].steps[phases[pi].steps.length-1].t:phases[pi].duration;
@@ -487,9 +609,14 @@ function importBuild(){
     r.onload=ev=>{
       try{
         const d=JSON.parse(ev.target.result);
-        buildName=d.name||'';phases=d.phases||[];
-        save();renderBuild();
-        alert('빌드를 불러왔습니다!');
+        const name=d.name||'가져온 빌드';
+        const ph=d.phases||[];
+        slots.push({id:Date.now(),name,phases:ph});
+        saveSlots();
+        activeSlot=slots.length-1;activePreset='custom';
+        buildName=name;phases=JSON.parse(JSON.stringify(ph));
+        renderBuildDropdowns();renderBuild();buildTimerView();
+        alert('"'+name+'" 빌드를 추가했습니다!');
       }catch(err){alert('파일 형식이 올바르지 않습니다.');}
     };
     r.readAsText(f);
@@ -497,8 +624,9 @@ function importBuild(){
   input.click();
 }
 function clearAll(){
-  if(!confirm('전체 빌드를 삭제할까요?'))return;
-  buildName='';phases=[];save();renderBuild();
+  if(!confirm('현재 빌드의 구간을 전부 삭제할까요?'))return;
+  buildName=slots[activeSlot]?.name||'';phases=[];
+  save();renderBuild();buildTimerView();
 }
 
 // ===== TABS =====
@@ -690,8 +818,8 @@ function toggle(){
   } else {
     running=true;
     document.getElementById('btnS').textContent='일시정지';document.getElementById('btnS').className='b b2';
-    // Auto-start origin if not running
-    if(!originRunning){toggleOrigin();}
+    // Auto-start origin if enabled and not running
+    if(originEnabled&&!originRunning){toggleOrigin();}
     startRef=performance.now()-tMs;
     iv=setInterval(()=>{
       tMs=performance.now()-startRef;
@@ -832,19 +960,62 @@ function applyDelay(){
 try{const sd=localStorage.getItem('build_delay');if(sd)document.getElementById('delayVal').value=sd;}catch(e){}
 
 // ===== ORIGIN TRACKER =====
-let originCd=338.4; // default 0쿨뚝
+let originCd=338.4;
 let originMs=0,originRunning=false,originIv=null,originStartRef=0;
+let originEnabled=false;
 
-const ORIGIN_CD={p0:338.4,p2:336.4,p5:333.4,boost:338.4,custom:338.4};
+const MERC_PCT={0:0,120:0.03,180:0.04,200:0.05,250:0.06};
+
+function calcOriginCd(){
+  const mercLv=parseInt(document.getElementById('mercLv').value)||0;
+  const hat=parseFloat(document.getElementById('originHat').value)||0;
+  const pct=MERC_PCT[mercLv]||0;
+  const base=360;
+  let cd=base*(1-pct)-hat;
+  if(cd<10)cd=10*(1-0.05*(hat-(base*(1-pct)-10)));
+  cd=Math.max(10,Math.round(cd*10)/10);
+  originCd=cd;
+  document.getElementById('originCfgResult').textContent='= '+cd+'초';
+  updateOriginDisplay();
+  // Save settings
+  try{localStorage.setItem('origin_cfg',JSON.stringify({mercLv,hat,enabled:originEnabled}));}catch(e){}
+}
 
 function getOriginCd(){
-  return ORIGIN_CD[activePreset]||338.4;
+  return originCd;
+}
+
+function toggleOriginCfg(){
+  originEnabled=document.getElementById('chkOrigin').checked;
+  document.getElementById('originCfgFields').style.display=originEnabled?'flex':'none';
+  document.getElementById('originBar').style.display=originEnabled?'block':'none';
+  if(originEnabled){calcOriginCd();}
+  else{if(originRunning){clearInterval(originIv);originRunning=false;}}
+  try{localStorage.setItem('origin_cfg',JSON.stringify({
+    mercLv:parseInt(document.getElementById('mercLv').value)||0,
+    hat:parseFloat(document.getElementById('originHat').value)||0,
+    enabled:originEnabled
+  }));}catch(e){}
+}
+
+function loadOriginCfg(){
+  try{
+    const d=JSON.parse(localStorage.getItem('origin_cfg'));
+    if(d){
+      originEnabled=!!d.enabled;
+      document.getElementById('chkOrigin').checked=originEnabled;
+      document.getElementById('originCfgFields').style.display=originEnabled?'flex':'none';
+      if(d.mercLv!==undefined)document.getElementById('mercLv').value=d.mercLv;
+      if(d.hat!==undefined)document.getElementById('originHat').value=d.hat;
+      if(originEnabled)calcOriginCd();
+    }
+  }catch(e){}
 }
 
 function showOriginBar(){
   const bar=document.getElementById('originBar');
-  if(bar)bar.style.display='block';
-  originCd=getOriginCd();
+  if(bar)bar.style.display=originEnabled?'block':'none';
+  if(originEnabled)calcOriginCd();
 }
 
 function toggleOrigin(){
@@ -918,43 +1089,38 @@ const PRESET_DATA = {
 let activePreset='custom';
 
 function selectPreset(val){
-  // Stop timer if running
   if(running){clearInterval(iv);running=false;}
   tMs=0;firedSet.clear();speechSynthesis?.cancel();
   document.getElementById('btnS').textContent='시작';document.getElementById('btnS').className='b b1';document.getElementById('btnS').disabled=false;
 
-  if(val==='custom'){
-    activePreset='custom';
-    if(savedCustom){buildName=savedCustom.name;phases=JSON.parse(JSON.stringify(savedCustom.phases));}
-    else{load();}
-  } else {
-    if(activePreset==='custom'){savedCustom={name:buildName,phases:JSON.parse(JSON.stringify(phases))};}
-    activePreset=val;
-    const p=PRESET_DATA[val];
-    if(!p){activePreset='custom';load();renderBuild();buildTimerView();return;}
-    buildName=p.name;
-    phases=JSON.parse(JSON.stringify(p.phases));
-    // Apply delay
-    const delay=parseFloat(document.getElementById('delayVal').value)||0;
-    if(delay>0){phases.forEach(ph=>{ph.duration=ph.duration+delay;});}
+  if(val.startsWith('slot_')){
+    const idx=parseInt(val.replace('slot_',''));
+    switchSlot(idx);
+    originCd=getOriginCd();updateOriginDisplay();
+    return;
   }
-  // Update origin cd
-  originCd=getOriginCd();
-  updateOriginDisplay();
-  // Sync both dropdowns
-  const ts=document.getElementById('presetSelect');
-  const bs=document.getElementById('buildPresetSelect');
-  if(ts)ts.value=val;
-  if(bs)bs.value=val;
-  renderBuild();
-  buildTimerView();
+  // Save current slot before switching to preset
+  if(activePreset==='custom'&&slots[activeSlot]){
+    slots[activeSlot].name=buildName;
+    slots[activeSlot].phases=JSON.parse(JSON.stringify(phases));
+    saveSlots();
+  }
+  activePreset=val;
+  const p=PRESET_DATA[val];
+  if(!p){activePreset='custom';load();renderBuild();buildTimerView();return;}
+  buildName=p.name;
+  phases=JSON.parse(JSON.stringify(p.phases));
+  const delay=parseFloat(document.getElementById('delayVal').value)||0;
+  if(delay>0){phases.forEach(ph=>{ph.duration=ph.duration+delay;});}
+  originCd=getOriginCd();updateOriginDisplay();
+  renderBuildDropdowns();renderBuild();buildTimerView();
 }
 
 // ===== VOICES INIT =====
 if('speechSynthesis' in window){speechSynthesis.onvoiceschanged=()=>loadVoices();setTimeout(()=>{if(!document.getElementById('voiceSelect').options.length)loadVoices();},500);}
 
 // ===== INIT =====
-load();renderBuild();showOriginBar();updateOriginDisplay();
+load();renderBuildDropdowns();renderBuild();loadOriginCfg();showOriginBar();updateOriginDisplay();
 </script>
 </body>
 </html>
