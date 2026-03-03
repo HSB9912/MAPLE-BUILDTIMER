@@ -467,7 +467,7 @@ function renderBuildDropdowns(){
       const o=document.createElement('option');o.value='slot_'+i;o.textContent='📝 '+s.name;sel.appendChild(o);
     });
     const sep=document.createElement('option');sep.disabled=true;sep.textContent='──── 프리셋 ────';sel.appendChild(sep);
-    [['p0','🔥 극딜+준극 (0쿨뚝)'],['p2','🔥 극딜+준극 (2쿨뚝)'],['p5','🔥 극딜+준극 (5쿨뚝)'],['boost','🚀 부스트콜 (110초)']].forEach(([k,v])=>{
+    [['p0','🔥 극딜+준극 (0쿨뚝)'],['p2','🔥 극딜+준극 (2쿨뚝)'],['p5','🔥 극딜+준극 (5쿨뚝)'],['boost','🚀 부스트콜 (110초)'],['evan5','🐉 에반 수로 (5쿨뚝)']].forEach(([k,v])=>{
       const o=document.createElement('option');o.value=k;o.textContent=v;sel.appendChild(o);
     });
     sel.value=activePreset==='custom'?'slot_'+activeSlot:activePreset;
@@ -654,7 +654,7 @@ function buildTimerView(){
       let absE;
       if(ph.mode==='countdown') absE=elapsed+(ph.duration-st.t);
       else absE=elapsed+st.t;
-      flatSteps.push({elapsed:absE,skills:st.skills,note:st.note,phaseName:ph.name,phaseStart:elapsed,phaseDur:ph.duration});
+      flatSteps.push({elapsed:absE,skills:st.skills,note:st.note,phaseName:ph.name,phaseStart:elapsed,phaseDur:ph.duration,phaseMode:ph.mode});
     });
     elapsed+=ph.duration;
   });
@@ -675,8 +675,8 @@ function renderTimerList(){
     // Show phase-relative time
     const relT=st.elapsed-st.phaseStart;
     const pDur=st.phaseDur;
-    const remaining=pDur-relT;
-    const timeStr=remaining<10?remaining.toFixed(1)+'s':Math.round(remaining)+'s';
+    const timeVal=st.phaseMode==='countdown'?(pDur-relT):relT;
+    const timeStr=timeVal<10?timeVal.toFixed(1)+'s':Math.round(timeVal)+'s';
     html+=`<div class="tl upcoming" id="ts-${i}"><div class="tt">${timeStr}</div><div class="ts">${sk}</div></div>${nt}`;
   });
   w.innerHTML=html;
@@ -689,8 +689,9 @@ function renderPipList(doc){
     if(st.phaseName!==lastPh){html+=`<div class="psd">${st.phaseName||'구간'}</div>`;lastPh=st.phaseName;}
     const sk=st.skills.map(s=>{const c=getColor(s.color);return `<span class="ps" style="background:${c.bg};color:${c.c};font-size:10px;">${s.name}</span>`;}).join('');
     const nt=st.note?`<div class="pn">${st.note}</div>`:'';
-    const relT=st.elapsed-st.phaseStart;const remaining=st.phaseDur-relT;
-    const timeStr=remaining<10?remaining.toFixed(1)+'s':Math.round(remaining)+'s';
+    const relT=st.elapsed-st.phaseStart;const pDur=st.phaseDur;
+    const timeVal=st.phaseMode==='countdown'?(pDur-relT):relT;
+    const timeStr=timeVal<10?timeVal.toFixed(1)+'s':Math.round(timeVal)+'s';
     html+=`<div class="pr upcoming" id="p-ts-${i}"><div class="pt2">${timeStr}</div><div class="psk">${sk}</div></div>${nt}`;
   });
   b.innerHTML=html;
@@ -1090,7 +1091,45 @@ const PRESET_DATA = {
   ]}]},
   boost: {name:'부스트 콜 (110초)',phases:[{name:'🚀 부스트 콜',icon:'',mode:'countup',duration:110,steps:[
     {t:0,skills:[{name:'부스트 콜',color:'orange'}],note:''}
-  ]}]}
+  ]}]},
+  evan5: {name:'에반 수로 (5쿨뚝)',phases:[
+    {name:'⚡ 입장 전',icon:'',mode:'countup',duration:56,steps:[
+      {t:0,skills:[{name:'전분',color:'gray'},{name:'일필',color:'gray'}],note:'일필 ①'},
+      {t:9,skills:[{name:'메용2',color:'gray'},{name:'오쓰',color:'gray'}],note:''},
+      {t:13,skills:[{name:'프리드',color:'blue'}],note:''},
+      {t:25,skills:[{name:'카인링크',color:'gray'}],note:''},
+      {t:38,skills:[{name:'프리드',color:'blue'}],note:''},
+      {t:50,skills:[{name:'입장',color:'orange'}],note:''},
+      {t:52,skills:[{name:'입장 완료',color:'orange'}],note:''},
+      {t:53,skills:[{name:'브레스 + 돌아와',color:'gray'}],note:'불장판'},
+      {t:54,skills:[{name:'조디악',color:'cyan'}],note:'🚪 카운트 시작'},
+      {t:56,skills:[{name:'서먼 다이브 START',color:'purple'}],note:''}
+    ]},
+    {name:'🔥 본 타이머',icon:'',mode:'countdown',duration:120,steps:[
+      {t:120,skills:[{name:'프리드 3스택 + 다이브/다오어',color:'blue'}],note:'1~4단계'},
+      {t:117,skills:[{name:'일필',color:'gray'}],note:'일필 ③'},
+      {t:114,skills:[{name:'조디악',color:'cyan'}],note:'5단계 넘기기'},
+      {t:113,skills:[{name:'스위프트 돌아와 + 임브',color:'yellow'}],note:'6단계 진입'},
+      {t:90,skills:[{name:'프리드 4스택',color:'blue'}],note:''},
+      {t:89,skills:[{name:'어센트',color:'orange'},{name:'드브',color:'red'},{name:'어센트',color:'orange'},{name:'엘블',color:'green'}],note:'⚠️ 빡빡함! 잘써야됨'},
+      {t:87,skills:[{name:'일필',color:'gray'}],note:'일필 ④'},
+      {t:70,skills:[{name:'서먼',color:'purple'}],note:''},
+      {t:67,skills:[{name:'엔버링크',color:'red'}],note:'67~66'},
+      {t:64,skills:[{name:'어센트 (최종)',color:'orange'}],note:'64~61'},
+      {t:61,skills:[{name:'드브',color:'red'},{name:'프리드(캔슬)',color:'blue'},{name:'엘블',color:'green'}],note:''},
+      {t:60,skills:[{name:'메용2 + 오쓰',color:'gray'}],note:''},
+      {t:58,skills:[{name:'오리진',color:'coral'}],note:'시퀀스'},
+      {t:57,skills:[{name:'일필',color:'gray'}],note:'일필 ⑤'},
+      {t:52,skills:[{name:'스인미 + 크오솔',color:'gray'}],note:''},
+      {t:37,skills:[{name:'임브',color:'pink'}],note:''},
+      {t:30,skills:[{name:'프리드 6스택',color:'blue'}],note:''},
+      {t:27,skills:[{name:'일필',color:'gray'}],note:'일필 ⑥'},
+      {t:19,skills:[{name:'엔버링크',color:'red'}],note:'19~18'},
+      {t:16,skills:[{name:'조디악',color:'cyan'},{name:'드브',color:'red'},{name:'서먼(캔슬)',color:'purple'},{name:'엘블',color:'green'},{name:'임브',color:'pink'}],note:''},
+      {t:7,skills:[{name:'잔여 극딜 + 평딜',color:'gray'}],note:'남은 쿨 소진'},
+      {t:0,skills:[{name:'⏱️ 종료',color:'gray'}],note:''}
+    ]}
+  ]}
 };
 
 let activePreset='custom';
